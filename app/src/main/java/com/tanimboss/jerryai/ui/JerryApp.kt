@@ -73,8 +73,26 @@ fun JerryApp(viewModel: JerryViewModel) {
             selected = Page.VOICE.name
         }
     }
+    val documents = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            try {
+                val mime = context.contentResolver.getType(uri) ?: "application/octet-stream"
+                context.startActivity(Intent(Intent.ACTION_VIEW)
+                    .setDataAndType(uri, mime)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
+                navigationError = null
+            } catch (_: ActivityNotFoundException) {
+                navigationError = "No suitable document viewer is installed."
+                selected = Page.FEATURES.name
+            } catch (_: SecurityException) {
+                navigationError = "Android blocked opening the selected document."
+                selected = Page.FEATURES.name
+            }
+        }
+    }
     val navigate: (String) -> Unit = { destination ->
         when (destination) {
+            "DOCS" -> documents.launch(arrayOf("application/pdf", "text/plain", "image/*"))
             "CAMERA" -> {
                 try {
                     context.startActivity(Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA))
