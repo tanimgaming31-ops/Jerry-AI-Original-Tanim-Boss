@@ -2,6 +2,12 @@
 package com.tanimboss.jerryai.ui
 
 import android.content.ActivityNotFoundException
+import android.Manifest
+import android.content.pm.PackageManager
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.tanimboss.jerryai.voice.VoicePhase
 import android.content.Intent
 import androidx.core.net.toUri
 import android.os.Build
@@ -33,14 +39,19 @@ import com.tanimboss.jerryai.catalog.ImplementationState
 import com.tanimboss.jerryai.diagnostics.readPermissionDiagnostics
 import com.tanimboss.jerryai.settings.ThemeMode
 
-private val LightColors = lightColorScheme(
-    primary = Color(0xFF006B60), secondary = Color(0xFF426660),
-    background = Color(0xFFF4FAF7), surface = Color(0xFFF4FAF7),
-)
 private val DarkColors = darkColorScheme(
-    primary = Color(0xFF74E0CF), secondary = Color(0xFFA9CCC3),
-    background = Color(0xFF0C1918), surface = Color(0xFF0C1918),
+    primary = Color(0xFFFFCE77),
+    onPrimary = Color(0xFF23091D),
+    secondary = Color(0xFFFF3499),
+    background = Color(0xFF0E0413),
+    onBackground = Color.White,
+    surface = Color(0xFF2B1029),
+    onSurface = Color.White,
+    surfaceVariant = Color(0xFF451C38),
+    onSurfaceVariant = Color(0xFFEFD9E8),
+    outline = Color(0xFFBD5787),
 )
+
 private enum class Page(val title: String) { HOME("Home"), VOICE("Voice"), CHAT("Chat"), MEMORY("Memory"), ACTIONS("Actions"), FEATURES("Features"), SETTINGS("Settings"), DIAGNOSTICS("Diagnostics"), ABOUT("About") }
 
 @Composable
@@ -48,78 +59,99 @@ fun JerryApp(viewModel: JerryViewModel) {
     val actionsViewModel = viewModel<ActionsViewModel>()
     val voiceViewModel = viewModel<VoiceViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val dark = when (state.settings.theme) {
-        ThemeMode.SYSTEM -> isSystemInDarkTheme()
-        ThemeMode.LIGHT -> false
-        ThemeMode.DARK -> true
+    val voiceState by voiceViewModel.state.collectAsStateWithLifecycle()
+    val voicePreferences by voiceViewModel.preferences.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var selected by rememberSaveable { mutableStateOf(Page.HOME.name) }
+    var navigationError by remember { mutableStateOf<String?>(null) }
+    val page = Page.entries.firstOrNull { it.name == selected } ?: Page.HOME
+
+    val microphone = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) voiceViewModel.start()
+        else {
+            voiceViewModel.message("Microphone permission denied. No audio was captured.")
+            selected = Page.VOICE.name
+        }
     }
-    MaterialTheme(colorScheme = if (dark) DarkColors else LightColors) {
-        var selected by rememberSaveable { mutableStateOf(Page.HOME.name) }
-        val page = Page.entries.firstOrNull { it.name == selected } ?: Page.HOME
-        val voiceState by voiceViewModel.state.collectAsStateWithLifecycle()
-        val voicePreferences by voiceViewModel.preferences.collectAsStateWithLifecycle()
-        if (page == Page.HOME) {
-            JerryNeonHomeScreen(voicePhase = voiceState.phase, keyConfigured = voicePreferences.keyPresent) { destination ->
-                if (Page.entries.any { it.name == destination }) selected = destination
+    val navigate: (String) -> Unit = { destination ->
+        when (destination) {
+            "CAMERA" -> {
+                try {
+                    context.startActivity(Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA))
+                    navigationError = null
+                } catch (_: ActivityNotFoundException) {
+                    navigationError = "No camera application is available."
+                    selected = Page.DIAGNOSTICS.name
+                } catch (_: SecurityException) {
+                    navigationError = "Android blocked opening the camera."
+                    selected = Page.DIAGNOSTICS.name
+                }
             }
-        } else Scaffold { padding ->
-            Column(Modifier.fillMaxSize().padding(padding)) {
-                Column(Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
-                    Text("JERRY / ORIGINAL", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-                    Text("Jerry AI Original", style = MaterialTheme.typography.headlineSmall)
-                }
-                // Two short rows stay usable on narrow phones and at large font sizes.
-                Page.entries.chunked(3).forEach { row ->
-                    Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        row.forEach { destination ->
-                            FilterChip(
-                                selected = page == destination,
-                                onClick = { selected = destination.name },
-                                label = { Text(destination.title) },
-                                modifier = Modifier.weight(1f),
-                            )
-                        }
+            else -> Page.entries.firstOrNull { it.name == destination }?.let { selected = it.name }
+        }
+    }
+    val openNotifications: () -> Unit = {
+        try {
+            context.startActivity(
+                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+            )
+            navigationError = null
+        } catch (_: ActivityNotFoundException) {
+            navigationError = "This Android device has no supported notification settings screen."
+            selected = Page.DIAGNOSTICS.name
+        } catch (_: SecurityException) {
+            navigationError = "Android denied notification settings."
+            selected = Page.DIAGNOSTICS.name
+        }
+    }
+    val startFromMic: () -> Unit = {
+        if (voiceState.phase !in listOf(VoicePhase.IDLE, VoicePhase.ERROR)) {
+            selected = Page.VOICE.name
+        } else if (!voicePreferences.keyPresent || !voicePreferences.config.valid()) {
+            selected = Page.VOICE.name
+        } else if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            voiceViewModel.start()
+        } else {
+            microphone.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
+
+    MaterialTheme(colorScheme = DarkColors) {
+        when (page) {
+            Page.HOME -> JerryNeonHomeScreen(
+                voicePhase = voiceState.phase, keyConfigured = voicePreferences.keyPresent,
+                onOpen = navigate, onMic = startFromMic,
+            )
+            Page.SETTINGS -> JerryNeonSettingsScreen(
+                theme = state.settings.theme,
+                voicePhase = voiceState.phase,
+                keyConfigured = voicePreferences.keyPresent,
+                language = com.tanimboss.jerryai.voice.VoiceConfig.languages[voicePreferences.config.language] ?: "English",
+                onThemeChange = viewModel::setTheme,
+                onOpen = navigate,
+                onNotifications = openNotifications,
+            )
+            else -> JerryNeonPageShell(title = page.title, current = page.name, onOpen = navigate) {
+                navigationError?.let { JerryNeonInfoCard("Android action", it) }
+                state.error?.let { JerryNeonInfoCard("Settings error", it) }
+                when (page) {
+                    Page.CHAT -> JerryNeonInfoCard(
+                        "AI Chat is not ready yet",
+                        "The Chat and conversation history implementation belongs to Phase 3. Voice chat is available on the separate Voice screen, subject to your key and provider access.",
+                        onClick = { selected = Page.VOICE.name },
+                    )
+                    Page.MEMORY -> {
+                        JerryNeonInfoCard("Memory Bank • planned",
+                            "Room memory and backup/restore are not implemented. No existing personal memory or settings were deleted. Do not mistake this design for a functioning backup.")
+                        JerryNeonInfoCard("Privacy", "Your Gemini key stays encrypted in Android Keystore, outside backups. Gemini voice audio goes to the selected provider only after you start a session.")
                     }
-                }
-                key(page) {
-                    Column(
-                        Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                        when (page) {
-                            Page.HOME -> Home()
-                            Page.CHAT -> {
-                                Text("AI Chat • planned", style = MaterialTheme.typography.headlineSmall)
-                                InformationCard("Not implemented yet",
-                                    "Text AI chat and conversation history are in the Phase 3 backlog. This screen does not send prompts or simulate responses.")
-                            }
-                            Page.MEMORY -> {
-                                Text("Memory Bank • planned", style = MaterialTheme.typography.headlineSmall)
-                                InformationCard("No memories are stored here yet",
-                                    "Room memory, personal learning and backup/restore are planned for Phase 3. Your existing settings and voice key remain unchanged.")
-                            }
-                            Page.FEATURES -> Features()
-                            Page.SETTINGS -> {
-                                Text("Appearance", style = MaterialTheme.typography.headlineSmall)
-                                Text("Choose a theme. This preference stays on this device.")
-                                if (state.loading) Text("Loading settings…")
-                                ThemeMode.entries.forEach { theme ->
-                                    FilterChip(
-                                        selected = state.settings.theme == theme,
-                                        enabled = !state.loading,
-                                        onClick = { viewModel.setTheme(theme) },
-                                        label = { Text("${theme.label} theme") },
-                                    )
-                                }
-                                Text("Gemini Live model, voice, language, persona and encrypted API key are configured on the Voice page. Memory settings are not available yet.")
-                            }
-                            Page.DIAGNOSTICS -> Diagnostics()
-                            Page.ABOUT -> About()
-                            Page.ACTIONS -> ActionsScreen(actionsViewModel)
-                            Page.VOICE -> VoiceScreen(voiceViewModel)
-                        }
-                    }
+                    Page.VOICE -> VoiceScreen(voiceViewModel)
+                    Page.ACTIONS -> ActionsScreen(actionsViewModel)
+                    Page.FEATURES -> Features()
+                    Page.DIAGNOSTICS -> Diagnostics()
+                    Page.ABOUT -> About()
+                    Page.HOME, Page.SETTINGS -> Unit
                 }
             }
         }
@@ -128,12 +160,7 @@ fun JerryApp(viewModel: JerryViewModel) {
 
 @Composable
 private fun InformationCard(title: String, body: String) {
-    Card(shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(body)
-        }
-    }
+    JerryNeonInfoCard(title, body)
 }
 
 @Composable
