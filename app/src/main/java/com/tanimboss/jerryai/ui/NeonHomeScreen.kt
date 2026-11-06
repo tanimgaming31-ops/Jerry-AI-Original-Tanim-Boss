@@ -131,7 +131,7 @@ internal fun JerryNeonHomeScreen(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 NeonShortcut("▣", "Camera & Scan", "Camera", Modifier.weight(1f)) { onOpen("CAMERA") }
-                NeonShortcut("▤", "Read Documents", "Planned", Modifier.weight(1f)) { onOpen("FEATURES") }
+                NeonShortcut("▤", "Read Documents", "File picker", Modifier.weight(1f)) { onOpen("DOCS") }
                 NeonShortcut("A文", "Translate & Interpret", "Voice only", Modifier.weight(1f)) { onOpen("VOICE") }
                 NeonShortcut("▱", "More Tools", "View list", Modifier.weight(1f)) { onOpen("FEATURES") }
             }
