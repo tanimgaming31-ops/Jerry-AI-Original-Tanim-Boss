@@ -15,44 +15,39 @@ class FoundationDeviceTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
     @Test fun allScreensAreReachable() {
-        compose.onNodeWithText("Features", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("Jerry AI Original", useUnmergedTree = true).assertExists()
+        compose.onNodeWithText("More Tools", useUnmergedTree = true).performClick()
         compose.onNodeWithText("Feature inventory").assertIsDisplayed()
-        compose.onNodeWithText("Settings", useUnmergedTree = true).performClick()
-        compose.onNodeWithText("Appearance").assertIsDisplayed()
-        compose.onNodeWithText("Diagnostics", useUnmergedTree = true).performClick()
-        compose.onNodeWithText("Permission diagnostics").assertIsDisplayed()
-        compose.onNodeWithText("About", useUnmergedTree = true).performClick()
-        compose.onNodeWithText("Original contributions").assertIsDisplayed()
-        compose.onNodeWithText("Actions", useUnmergedTree = true).performClick()
-        compose.onNodeWithText("Supported commands").assertIsDisplayed()
         compose.onNodeWithText("Home", useUnmergedTree = true).performClick()
-        compose.onNodeWithText("Foreground voice").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("⚙", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("Settings & Personalization").assertIsDisplayed()
+        compose.onNodeWithText("Permissions", useUnmergedTree = true).performScrollTo().performClick()
+        compose.onNodeWithText("Permission diagnostics").assertIsDisplayed()
+        compose.onNodeWithText("Profile", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("Original contributions").assertIsDisplayed()
+        compose.onNodeWithText("Tools", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("Supported commands").assertIsDisplayed()
+        compose.onNodeWithText("Chat", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("AI Chat is not ready yet").assertIsDisplayed()
+        compose.onNodeWithText("Memory", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("Memory Bank • planned").assertIsDisplayed()
     }
 
-    @Test fun themeAndPageSurviveActivityRecreation() {
-        compose.onNodeWithText("Settings", useUnmergedTree = true).performClick()
-        compose.waitUntil(5_000) { compose.onAllNodesWithText("Loading settings…").fetchSemanticsNodes().isEmpty() }
+    @Test fun themePreferencePersistsWithNeonInterface() {
+        compose.onNodeWithText("⚙", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("Theme", useUnmergedTree = true).performClick()
         try {
-            compose.onNodeWithText("Dark theme").performClick()
-            compose.waitUntil(5_000) {
-                compose.onAllNodes(hasText("Dark theme") and isSelected()).fetchSemanticsNodes().size == 1
-            }
-            compose.onNodeWithText("Dark theme").assertIsSelected()
+            compose.onNode(hasText("Dark system preference", substring = true)).performClick()
             compose.activityRule.scenario.recreate()
-            compose.waitUntil(5_000) {
-                compose.onAllNodes(hasText("Dark theme") and isSelected()).fetchSemanticsNodes().size == 1
-            }
-            compose.onNodeWithText("Dark theme").assertIsSelected()
+            compose.onNodeWithText("Theme", useUnmergedTree = true).performClick()
+            compose.onNodeWithText("● Dark system preference").assertExists()
         } finally {
-            compose.onNodeWithText("System theme").performClick()
-            compose.waitUntil(5_000) {
-                compose.onAllNodes(hasText("System theme") and isSelected()).fetchSemanticsNodes().size == 1
-            }
+            compose.onNode(hasText("System system preference", substring = true)).performClick()
         }
     }
 
     @Test fun cancellingActionPreviewDoesNotExecute() {
-        compose.onNodeWithText("Actions", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("Tools", useUnmergedTree = true).performClick()
         compose.onNodeWithText("Command").performScrollTo().performTextInput("dial 5551234")
         compose.onNodeWithText("Preview command").performScrollTo().performClick()
         compose.onNodeWithText("Confirm one action").assertIsDisplayed()
