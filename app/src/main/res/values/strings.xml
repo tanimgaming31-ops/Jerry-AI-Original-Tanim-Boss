@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Jerry AI Assistant</string>
+    <string name="app_name">Jerry AI Original</string>
     <string name="accessibility_name">Jerry confirmed commands</string>
     <string name="accessibility_description">Optional automation for commands you preview and confirm in Jerry. Can read accessible screen content, tap, scroll, swipe, and enter text in the selected app. It does not bypass Android permissions or lock screens. Nothing is recorded or retained. Enable here, then separately allow an automation session in Jerry. Disable this service at any time in Android settings.</string>
 </resources>

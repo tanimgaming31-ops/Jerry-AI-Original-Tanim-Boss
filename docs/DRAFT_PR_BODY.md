@@ -1,22 +1,25 @@
-Jerry AI Original now has an independently developed Kotlin/Compose foundation
-and a confirmation-gated Android command system. Official intents take priority
-over an optional user-enabled accessibility service; no Gemini Live or background
-voice capability is claimed.
+Jerry AI Original gains an independently developed foreground Gemini Live client,
+PCM microphone/playback pipeline and explicit session controls while preserving
+the existing confirmed Android command system and application ID.
 
-- Original six-screen UI, persistent themes, permission/service diagnostics, and
-  an explicit 24-group feature inventory with missing/device-unverified status.
-- Single-use confirmations, protected target/editor checks, scoped tap/swipe/scroll/
-  text actions, and truthful observed/unverified/failure/cancellation reporting.
-- Official launcher/search/Home/dialer/SMS-composer intents; no direct call or send.
-- Tanim Boss license limited to original owned contributions, preserved upstream
-  notices, source-review findings/hashes, and no old project source imported.
-- Feature-branch/PR/manual GitHub Actions builds with APK, checksum, feature status,
-  downloadable artifact URL in the run summary, and 30-day retention.
+- API-key header authentication, provider model discovery, setup/activity/PCM/
+  transcription/resumption messages, sanitized failures and bounded retries.
+- Foreground-only microphone consent, focus/AEC, bounded queues, interruption,
+  mute/Stop, stale-event guards and background shutdown. No AI device tools.
+- Keystore-encrypted user key, persistent voice/language/persona settings, captions,
+  and exact English/Bengali input controls. No credentials embedded in source/CI.
+- Owner's complete 54-group inventory and structured backlog with explicit partial/
+  planned/device-unverified status; privacy, checklist, architecture and changelog.
+- Preserved action handlers, themes, confirmation gates, user data and third-party
+  licenses. No old Tech GPTx implementation or protected UI assets imported.
 
-Validation: a clean Java 17/Android API 36 build passed 35 JVM tests (0 failures,
-errors or skips), Android lint (0 issues), debug APK and instrumentation APK builds,
-packaged permission/capability/license checks, signing verification and actionlint.
-Four instrumentation scenarios compiled but were not run: no Android device is
-attached. Dedicated app integrations, screenshots, multi-step tasks, memory,
-Gemini/streaming/wake-word/background voice remain unimplemented. See
-FEATURE_STATUS.md and docs/DEVICE_TESTING.md. No production release is requested.
+Validation: 83 JVM tests passed, 0 failures/errors/skips; both APKs built; packaged
+identity/permission/capability/license checks, signing, actionlint and shell checks
+passed. Lint: 0 errors, 2 visible version-update advisories; pinned OkHttp 5.3.2 is
+compatible with SDK 36 whereas 5.5.1 requires SDK 37. Six instrumentation scenarios
+compiled but were not run. Actual Google/model/language/audio behavior and Keystore
+hardware acceptance need a physical phone and the user's own provider key.
+
+This is a draft review, not a claim that Phase 1 acceptance or all 54 groups are
+complete. Wake word, background voice, Room memories and remaining phases stay
+backlogged. No production release or automatic main merge is requested.

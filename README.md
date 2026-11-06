@@ -1,109 +1,93 @@
 # Jerry AI Original
 
-**App:** Jerry AI Assistant · **Original developer, owner, publisher:** Tanim Boss
+**Assistant:** Jerry · **Original owner/publisher:** Tanim Boss
+**Application ID:** `com.tanimboss.jerryai` · Android 10+ · Kotlin/Compose
 
-Independent Kotlin/Compose Android project, now at **0.2.0 — confirmed actions**.
-Original UI, persistent themes, feature tracking, diagnostics, and an optional
-user-enabled command/accessibility layer. Android-phone behavior is **not tested**.
-Gemini Live, wake word, background listening, chat/history, memory and app-specific
-integrations remain future work.
+Version **0.3.0-live-voice** adds the Phase 1 source implementation to the existing
+confirmed-command app. **Real Gemini service and Android-phone acceptance remain
+unverified.** Compilation and mock tests are not proof of an actual conversation.
+All 54 approved groups are tracked in [FEATURE_INVENTORY.md](FEATURE_INVENTORY.md),
+[FEATURE_STATUS.md](FEATURE_STATUS.md), and [the structured backlog](docs/FEATURE_BACKLOG.json).
+Wake word “Hey Jerry”, microphone FGS, background/offline voice, Room memories and
+remaining phases are planned, not claimed working.
 
-## Supported commands
+## Foreground Gemini Live
 
-Open **Actions**, choose a target app, and type a command or use **Speak command**.
-Speech recognition is delegated to the phone's speech app and may process audio
-online under that app's policies; it only fills the command field. Preview and
-confirm every action. A confirmation is single-use and expires after 30 seconds.
+Open **Voice**, enter your own Gemini API key, choose a currently supported Live
+model ID (or explicitly discover advertised models), save preferences and press
+**Start foreground voice**. Permission and successful Gemini setup are required
+before capture. Model, voice, language and free quota availability are controlled
+by Google; check your account and do not assume usage is free. There is no automatic
+paid-model fallback or embedded key. Keys use Android Keystore-backed AES-GCM in
+noBackupFilesDir; raw audio/captions and resumption handles stay in memory.
 
-- `open app`, `home`, `back`
-- `search music`, `tap Search`, `type Hello`
+The original client streams PCM16 mono at 16 kHz and plays 24 kHz responses. Local
+activity detection and manual interruption clear old playback and signal Gemini.
+Mute stops capture; Stop releases audio/socket; leaving the app stops the session.
+Retry is bounded and captured audio is never replayed. Focus-loss/permission/model/
+quota/network failures are explicit. See [voice architecture](docs/VOICE_ARCHITECTURE.md)
+and [privacy](PRIVACY.md) for boundaries, transient data and model-dependent behavior.
+
+Five provider voice names and six persona modes are offered. Listed language
+families are requested in the system instruction, not universally guaranteed.
+Exact input-transcript controls include “Jerry, switch to friendly mode”,
+“জেরি, বন্ধুত্বপূর্ণ মোড চালু করো”, “Jerry, stop listening”, and
+“জেরি শোনা বন্ধ করো”. They require provider input transcripts/turn boundaries;
+use the Stop button when offline. Persona changes restart a fresh Live context.
+Gemini has **no device tools** and cannot bypass action confirmations.
+
+## Preserved Android commands
+
+Open **Actions**, choose a target, type or invoke Android's external speech
+recognition, preview and confirm every action. Recognizer output never auto-executes.
+
+- `open app`, `home`, `back`, `search music`, `tap Search`, `type Hello`
 - `swipe up/down/left/right`, `scroll up/down/left/right`
-- `dial +15551234567` (or `call ...`) opens the dialer; **Jerry does not place a call**.
-- `message +15551234567: Hello` opens an SMS composer; **Jerry does not send it**.
+- `dial +15551234567` / `call ...` opens the dialer; Jerry does not directly call.
+- `message +15551234567: Hello` opens an SMS composer; Jerry does not directly send.
 
-Android launcher/search/dialer/composer/Home intents take priority. For optional
-Back/tap/swipe/scroll/text/search-field fallback, manually enable **Jerry confirmed
-commands** in Android Accessibility settings, read its disclosure, then turn on
-**Allow automation this session** in Jerry. Service enablement alone does not arm
-it. Android restrictions are never bypassed. Consent resets on disconnection,
-process restart, or Stop. Screenshots and continuous observation are not enabled.
+Official APIs/intents take priority. Optional fallback requires manually enabling
+Jerry in Android Accessibility settings plus separate session opt-in. No permission
+or lockscreen bypass is attempted. Search fallback only fills an eligible search
+field; the user submits it. Exact/unique selectors and bounded verification reject
+ambiguous or inaccessible screens. An observed UI change is not message delivery
+or other external completion. [Supported actions and limits](docs/ACTIONS.md).
+Existing themes, confirmation/safety gates, diagnostics and data are retained.
 
-Accessibility actions launch the selected app, wait for its accessible foreground
-window, and perform one confirmed action. Taps need an exact, unique accessible
-label. Text entry replaces a focused or unique editable field, excluding password
-fields. Search fallback fills an eligible search field but does not submit it.
-Ambiguous, inaccessible, protected, rejected, or timed-out actions report failures
-or an unverified result. Gestures and UI changes do not prove message delivery or
-other external effects. Do not retry an unverified sensitive action blindly.
+## Build and tests
 
-See [command behavior and limits](docs/ACTIONS.md) before using automation.
-
-## Build
-
-Requires Java 17, Android SDK platform 36, Build Tools 36.0.0, and platform-tools.
-On a configured Android development machine:
+Requires Java 17, Android SDK API 36, Build Tools 36.0.0 and platform-tools.
 
 ```bash
-# Set JAVA_HOME to your JDK 17 and ANDROID_HOME to your SDK first.
-./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest
-```
-
-On this managed Linux x86_64 cloud machine:
-
-```bash
+# Managed Linux cloud only; Android Studio users configure their own JDK/SDK.
 ./scripts/setup-cloud.sh
 source scripts/cloud-env.sh
 ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest
+python3 scripts/verify-foundation-apk.py
 ```
 
-The cloud bootstrap installs pinned, checksum-verified tools outside the checkout,
-accepts SDK development terms, and preserves proxy/TLS verification. It requires
-curl, unzip, Python 3, and dpkg-deb. It never writes credentials into the project.
-For local Android Studio use, open this directory and choose JDK 17; configure the
-SDK through Android Studio or an ignored `local.properties`.
+Main APK: `app/build/outputs/apk/debug/app-debug.apk` (development signing only).
+Tests/HTML/lint reports: `app/build/reports/`. Latest verification:
+[docs/PHASE1_VERIFICATION.md](docs/PHASE1_VERIFICATION.md). Instrumentation compilation
+is not execution. Run `./gradlew connectedDebugAndroidTest` only with an authorized
+physical phone; follow [TEST_CHECKLIST.md](TEST_CHECKLIST.md) and
+[device testing](docs/DEVICE_TESTING.md). Never put real credentials in tests/CI.
 
-Verify the packaged permission, service-binding and license contract with
-`python3 scripts/verify-foundation-apk.py` after building.
+The existing workflow builds this development branch and PRs, runs tests/lint,
+checks packaged identity/permissions/licenses, and uploads the debug APK with a
+checksum, status and test reports. Use the **actual new run** artifact URL; successful
+baseline run 42258390538 is not evidence of the new voice implementation. Manual
+dispatch may depend on default-branch workflow availability. No main merge or
+production release is automated.
 
-Debug APK: `app/build/outputs/apk/debug/app-debug.apk`.
-This APK is development-signed, not a release distribution. Keep the original
-checkout in the isolated cloud task; no additional Git worktree is needed.
+## Ownership and independent development
 
-## Android-phone-first verification
+Original code, UI and assets are independently developed for Tanim Boss under
+[LICENSE](LICENSE). [Third-party notices](THIRD_PARTY_NOTICES.md) and full license
+texts remain intact. The old Jerry README was read only for functionality; no old
+Tech GPTx/Jerry implementation or protected assets were copied. Maya, Zoya, AYRA
+and Maya AI Keyboard are untouched. Current work uses the existing checkout and
+feature/jerry-original-full-features; no extra Git worktree is needed.
 
-```bash
-adb devices
-adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb shell am start -n com.tanimboss.jerryai/.MainActivity
-./gradlew connectedDebugAndroidTest
-```
-
-Only run the connected test command with an authorized Android device/emulator.
-Do not interpret compiling the test APK as executing its tests. Follow the
-[device checklist](docs/DEVICE_TESTING.md), including cold launch, denial handling,
-settings links, and process recreation. Device/hosted-CI results are recorded in
-[validation](docs/VALIDATION.md), without claiming unexecuted checks pass.
-
-## Feature-branch APK builds
-
-The `Android confirmed actions` workflow runs on this feature branch, pull requests
-and manual dispatch. After a successful run, open its summary and choose
-**Download debug APK artifact**. The artifact contains the debug APK, SHA256SUMS.txt,
-and FEATURE_STATUS.md and is retained for 30 days. GitHub sign-in and repository
-access may be required. This is not a production release or a device-test result.
-
-## Project documents
-
-- [Architecture and security boundaries](docs/ARCHITECTURE.md)
-- [Current feature status](FEATURE_STATUS.md) and [initial inventory](docs/FEATURE_INVENTORY.md)
-- [Development phases and acceptance gates](docs/DEVELOPMENT_PLAN.md)
-- [Validation evidence](docs/VALIDATION.md)
-- [Original-material license](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.md)
-
-GitHub Actions runs unit tests, Android lint, APK assembly, and instrumentation
-APK compilation, then uploads the debug APK and reports. It does not execute
-device tests. No remote workflow run is claimed before an approved push.
-
-The proprietary license applies only to legally owned original contributions.
-Third-party dependencies and the Gradle wrapper retain their own licenses.
-No old Jerry, Maya, Zoya, or Tech GPTx project source or protected assets were used.
+[Architecture](docs/ARCHITECTURE.md) · [Seven-phase plan](docs/DEVELOPMENT_PLAN.md) ·
+[Changelog](CHANGELOG.md) · [Privacy](PRIVACY.md) · [Historical reports](docs/VALIDATION.md)

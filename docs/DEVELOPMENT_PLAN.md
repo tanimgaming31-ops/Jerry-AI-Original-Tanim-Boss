@@ -1,41 +1,27 @@
-# Verified development phases
+# Seven-phase owner-approved development plan
 
-All phases use independent original code and assets. The first task delivers only
-Phase 0. Historical completeness is unverified; never invent missing approved
-specifications. Preserve IDs 1–24 and append new approved capabilities with their
-specification provenance rather than silently renaming or dropping groups.
+Canonical inventory: ../FEATURE_INVENTORY.md. Machine-readable backlog:
+FEATURE_BACKLOG.json. Historical initial 24-group inventory remains in
+FEATURE_INVENTORY.md in this directory; it is not the canonical 54-group numbering.
+No persisted user data used those IDs; no user-memory migration was performed.
 
-| Phase | Groups | Deliverable and acceptance gate |
+| Phase | Groups | Implementation/acceptance boundary |
 | --- | --- | --- |
-| 0 — Foundation | 21–24 (partial) | Original five-screen UI, theme persistence, read-only permission diagnostics, privacy/license information, catalog, JVM tests, lint and debug APK. Phone installation/navigation/process recreation remain a separate gate. |
-| 1 — Foreground assistant | 1–3, 7–8 | Verify current Gemini Live API/model support; phone-entered key; real audio sessions, interruption/cancel/reconnect, language/persona configuration, text chat/history. Test transport failure states, audio focus, timeout, cancellation and on-phone turn taking. |
-| 2 — Background voice | 4–6 | Choose an offline wake-word engine after checking license, model redistribution, device performance and training needs; explicit owner-voice enrollment; foreground microphone service and stop notification. Test airplane-mode wake word, false triggers, lock screen, denied/revoked permissions, interruptions, OEM battery restrictions and recovery without hidden recording. |
-| 3 — Supported integrations | 9–14, 18 | Confirmed contact/calling/messaging actions; YouTube search/media controls; phone controls; launcher; web/weather; Spotify/Instagram adapters. Specify exact supported actions and versions first. Verify recipients and outcomes, unavailable apps, denied permissions, locked device, unavailable APIs and unsupported operations. Do not infer full control from app launch. |
-| 4 — Assisted automation | 15–17 | Explicitly enabled accessibility service; consented screen observation/capture; bounded multi-step executor. Verify confirmation, cancellation, untrusted screen content, secure-window restrictions, layout/version changes and partial task failure. Never report an unobserved action as completed. |
-| 5 — Memory | 19–20 | Inspectable/editable/deletable memory; explicit learning and retention; encrypted local backup/restore via user-selected files. Test wrong password, truncated/corrupt backup, schema versions, interrupted restore, credential exclusion and full deletion. Cloud sync is out of scope until separately specified. |
+| 1 | 01,02,03,08,09,10 | Current increment: Live wire client, foreground audio, interruption, states, requested languages/voices/personas and secure configuration. Local/wire tests and build required; real provider and phone tests pending. Never mark complete based on compilation alone. |
+| 2 | 04–07 | Independently select licensed offline Hey Jerry engine/model after redistribution/performance review; user-started microphone FGS with notification Stop/Mute; Android-limited background/recovery and local phone commands. Test offline, lock/screen-off, revocation, battery/OEM policies and no hidden recording. |
+| 3 | 11–18 | Streamed text chat, Room history/memory, opt-in learning, encrypted backup/restore, summaries, selected-document retrieval and planning. Additive migrations must preserve all existing records, validate/rollback and obtain explicit user confirmation for destructive conflicts. |
+| 4 | 19–28 | Spoken-name launcher, supported phone controls, contacts/ambiguity/dialer, app-specific WhatsApp/IMO/Messenger/YouTube/Spotify, notification access/replies, capture and camera. Test real handlers/layouts, clone/work-profile limits, recipient confirmation and observed outcomes. |
+| 5 | 29–36 | Extend confirmed automation with bounded macros/task progress, only safe idempotent retries, alias learning without permission escalation, user-initiated clipboard/SAF files, routines and OS alarms/reminders. Test cancellation, partial failure, sensitive actions and OS scheduling limits. |
+| 6 | 37–44 | Consented screen understanding, selected PDFs/docs, QR/barcodes, user-corrected receipts/expenses, captions, translation, sourced weather/news and learning. Verify actual file/camera reads, source references, retention and language/model support. |
+| 7 | 45–54 | Original animated home/avatar assets/floating shortcut, complete settings and permission dashboard, structured diagnostics, owner/privacy controls, validated data migration/backup, ownership notices, version/update and honest feature statuses. No protected models/assets or covert surveillance. |
 
-Groups 21–24 expand in every phase: settings, permissions, privacy, diagnostics,
-and recovery are ongoing requirements, not completed by the foundation subset.
-Before implementing a later phase, record concrete actions, API contracts,
-permission needs, test cases and device acceptance criteria. Gemini, accessibility,
-and third-party app behavior are subject to platform and provider constraints.
+Every increment must preserve existing functionality, license notices and data,
+add meaningful unit tests and device scenarios, run Gradle/lint/APK checks, record
+actual executed versus unrun results, and publish only an authorized feature branch.
+No main merge or production release without explicit approval. Phone-only runtime
+testing is required for real provider/hardware behavior. Free tools do not imply
+free/unlimited Gemini usage; no paid fallback/account changes are automated.
 
-## Reporting and release discipline
-
-- Separate implementation, local JVM/build checks, hosted CI, emulator, and phone evidence.
-- Record tests executed, passed, failed, skipped, and unrun. Compilation is not a runtime test.
-- Update the catalog and inventory together; attach device model, Android version, date and limitations to device evidence.
-- Keep device logs free of API keys and personal message/audio content.
-- Never read, modify, import, or use old Jerry/Maya/Zoya or Tech GPTx source as a template.
-- Do not push, merge, publish, or create a release without the owner's authorization.
-- Preserve third-party licenses and review new model/library redistribution terms.
-
-## Confirmed-actions increment (0.2.0)
-
-Owner-authorized increment delivered ahead of complete Phases 3/4: official
-launcher/search/Home/dialer/SMS-composer intents; delegated foreground speech
-input; one-action confirmation gates; optional scoped accessibility Back/tap/
-swipe/scroll/text and search-field filling; bounded result checks. See ACTIONS.md.
-This does not complete voice, app-specific integrations, screenshots, contacts,
-actual call/message delivery, or multi-step task automation. All Android behavior
-still requires device testing; no phase is promoted based on compilation alone.
+Unfinished requirements are never dropped. Current statuses distinguish source
+implementation, partial work, plans, unsupported/failed behavior and real device
+evidence. No entry is marked working/device-verified without actual device evidence.

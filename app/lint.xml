@@ -10,4 +10,7 @@ Review these pins before changing target SDK or shipping production releases.
     <issue id="OldTargetApi" severity="warning" />
     <issue id="AndroidGradlePluginVersion" severity="warning" />
     <issue id="GradleDependency" severity="warning" />
+    <!-- OkHttp 5.5.x requires compileSdk 37; retain 5.3.2 compatible with SDK 36/Kotlin 2.2.21.
+         Keep upgrade advisories visible; do not disable API, permission or security checks. -->
+    <issue id="NewerVersionAvailable" severity="warning" />
 </lint>

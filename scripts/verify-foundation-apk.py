@@ -24,7 +24,9 @@ def verify(apk: Path) -> None:
     if manifest.get("package") != "com.tanimboss.jerryai":
         raise RuntimeError("Unexpected application ID.")
     permissions = {item.get(android + "name") for item in manifest.findall("uses-permission")}
-    allowed = {"com.tanimboss.jerryai.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"}
+    allowed = {"com.tanimboss.jerryai.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "android.permission.INTERNET", "android.permission.RECORD_AUDIO", "android.permission.MODIFY_AUDIO_SETTINGS"}
+    if not {"android.permission.INTERNET", "android.permission.RECORD_AUDIO", "android.permission.MODIFY_AUDIO_SETTINGS"} <= permissions:
+        raise RuntimeError("Required foreground voice permissions missing.")
     if permissions - allowed:
         raise RuntimeError(f"Unexpected app permissions: {sorted(permissions - allowed)}")
     sdk = manifest.find("uses-sdk")

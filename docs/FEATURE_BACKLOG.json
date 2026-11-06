@@ -1,0 +1,669 @@
+{
+  "version": 1,
+  "source": "Owner-approved master 54-group specification, 6 November 2026",
+  "baseline_commit": "72743c4d405f9ae7d445c78c3c3017c074f2171c",
+  "phases": 7,
+  "phase1_acceptance": "Pending actual provider and physical Android tests. No full completion claim.",
+  "features": [
+    {
+      "id": 1,
+      "title": "Gemini Live Voice Assistant",
+      "phase": 1,
+      "status": "IMPLEMENTED_DEVICE_UNVERIFIED",
+      "boundary": "Original authenticated v1beta Live WebSocket, model discovery, setup, sanitized failures and memory-only resumption. Provider/key/model and physical-phone acceptance remain unverified.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Run real provider/device acceptance and address any failures.",
+      "approved_requirements": "Real supported Gemini Live connection, user API key configuration, model selection, streaming responses, connection handling and explicit errors."
+    },
+    {
+      "id": 2,
+      "title": "Real-Time Bidirectional Audio",
+      "phase": 1,
+      "status": "IMPLEMENTED_DEVICE_UNVERIFIED",
+      "boundary": "Foreground PCM16 microphone capture, 16 kHz stream/resampling, 24 kHz playback, bounded buffers, focus and optional AEC. Hardware/network audio quality remains unverified.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Run real provider/device acceptance and address any failures.",
+      "approved_requirements": "Microphone capture, PCM processing, supported sample-rate conversion, bidirectional streaming, response playback, buffering and audio-focus management."
+    },
+    {
+      "id": 3,
+      "title": "Voice Interruptions and Barge-In",
+      "phase": 1,
+      "status": "IMPLEMENTED_DEVICE_UNVERIFIED",
+      "boundary": "Local activity detection, immediate playback invalidation, manual activity/barge-in signals and stale callback guards. Real Gemini cancellation/echo behavior needs phone testing.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Run real provider/device acceptance and address any failures.",
+      "approved_requirements": "Speech barge-in stops queued playback and safely interrupts the current model response; accept new speech without restarting the app."
+    },
+    {
+      "id": 4,
+      "title": "Offline Wake Word",
+      "phase": 2,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Offline Hey Jerry engine/model with activation settings, sensitivity and pronunciation variants; select supported redistributable technology."
+    },
+    {
+      "id": 5,
+      "title": "Foreground Voice Service",
+      "phase": 2,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "User-started microphone foreground service with persistent notification, Start/Stop/Mute, microphone indicators and permission handling."
+    },
+    {
+      "id": 6,
+      "title": "Background Voice Assistant",
+      "phase": 2,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Android-permitted background/screen-off operation, restarts, network loss and battery restrictions; no unrestricted background-mic claim."
+    },
+    {
+      "id": 7,
+      "title": "Offline Voice Commands",
+      "phase": 2,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Internet-free supported launcher, flashlight, volume and simple navigation commands; distinguish local execution from cloud recognition."
+    },
+    {
+      "id": 8,
+      "title": "Advanced Voice Session Management",
+      "phase": 1,
+      "status": "IMPLEMENTED_DEVICE_UNVERIFIED",
+      "boundary": "Serialized session states, mute/stop, bounded retries, setup timeout, focus-loss shutdown and foreground lifecycle cleanup. OS behavior remains unverified.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Run real provider/device acceptance and address any failures.",
+      "approved_requirements": "Listening, Thinking, Speaking, Idle, Muted, Reconnecting and Error states; no conflicting microphones or uncontrolled simultaneous playback."
+    },
+    {
+      "id": 9,
+      "title": "Multilingual Voice Understanding",
+      "phase": 1,
+      "status": "PARTIAL",
+      "boundary": "Persistent language requests for the listed language families and provider input/output captions. Full language recognition/output coverage is model-dependent and has not been verified.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Bengali, English, Hindi, Hinglish, Urdu, Arabic, Tagalog, Indonesian, Tamil, Telugu, Kannada, Malayalam, Marathi, Gujarati, Punjabi, Odia and additional engine-supported languages."
+    },
+    {
+      "id": 10,
+      "title": "AI Voice and Personality Modes",
+      "phase": 1,
+      "status": "IMPLEMENTED_DEVICE_UNVERIFIED",
+      "boundary": "Five provider voice names, six persona modes, saved preferences and exact English/Bengali input-transcript mode switching. Provider voice availability and actual persona output remain unverified.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Run real provider/device acceptance and address any failures.",
+      "approved_requirements": "Selectable voices; Assistant, Friendly, Companion, Professional, Focus and Tanim Boss Personal Mode; voice-controlled switching and persistent preferences."
+    },
+    {
+      "id": 11,
+      "title": "Advanced AI Text Chat",
+      "phase": 3,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Streamed text chat, conversation controls, timestamps, copy/share and deletion."
+    },
+    {
+      "id": 12,
+      "title": "Persistent Chat History",
+      "phase": 3,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Protected local conversation history, search, titles, new chats and deletion controls."
+    },
+    {
+      "id": 13,
+      "title": "Smart Memory Bank",
+      "phase": 3,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Room-backed personal memories with remember, recall, update, search and forget."
+    },
+    {
+      "id": 14,
+      "title": "Personal Learning Engine",
+      "phase": 3,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Only user-approved learning of preferences, languages, names, routines, hobbies and communication preferences."
+    },
+    {
+      "id": 15,
+      "title": "Memory Backup and Restore",
+      "phase": 3,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Local encrypted memory backup/export and safe confirmed restore with schema versioning and integrity verification."
+    },
+    {
+      "id": 16,
+      "title": "Conversation Summaries",
+      "phase": 3,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Long-conversation summaries and optional user-approved saving of useful information to memory."
+    },
+    {
+      "id": 17,
+      "title": "Personal Knowledge Search",
+      "phase": 3,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Permission-based selected PDF/note/document retrieval, source references and no claim to have read unprocessed files."
+    },
+    {
+      "id": 18,
+      "title": "AI Planning and Decision Assistant",
+      "phase": 3,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Explain structured steps, alternatives and risks; obtain confirmation before executing any sensitive plan."
+    },
+    {
+      "id": 19,
+      "title": "Universal App Launcher",
+      "phase": 4,
+      "status": "PARTIAL",
+      "boundary": "Selected launchable app intents and legacy foreground command input retained. Universal spoken-name resolution and all app/profile/clone cases remain pending.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Voice-name launch for installed WhatsApp, YouTube, Instagram, Facebook, Messenger, IMO, Telegram, Chrome, Spotify, Gmail, Maps, Camera and other supported apps."
+    },
+    {
+      "id": 20,
+      "title": "Advanced Phone Controls",
+      "phase": 4,
+      "status": "PARTIAL",
+      "boundary": "Confirmed Home intent and optional accessibility Back retained. Flashlight, brightness, media/volume and broader controls remain pending.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Official-API-first flashlight, brightness, volume, media, Home/Back and supported Android controls."
+    },
+    {
+      "id": 21,
+      "title": "Contact Search and Calling",
+      "phase": 4,
+      "status": "PARTIAL",
+      "boundary": "Confirmed dialer intent retained; contact lookup, ambiguity resolution and actual calling are not implemented.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Permission-based contacts, ambiguous-name resolution, visible recipient selection and confirmed dialer/permitted calling."
+    },
+    {
+      "id": 22,
+      "title": "WhatsApp Voice Assistant",
+      "phase": 4,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Main/separately installed/cloned WhatsApp where Android permits; contact selection, drafting, recipient verification, consent-based send workflow; never infer delivery."
+    },
+    {
+      "id": 23,
+      "title": "IMO and Messenger Assistant",
+      "phase": 4,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Permitted IMO/Messenger contact lookup, conversation opening, message composition via supported intents or approved accessibility; safely reject unknown layouts."
+    },
+    {
+      "id": 24,
+      "title": "YouTube Search and Playback",
+      "phase": 4,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "YouTube search with displayed results and explicit video selection; supported playback control; distinguish opening from actually playing."
+    },
+    {
+      "id": 25,
+      "title": "Spotify and Media Assistant",
+      "phase": 4,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Spotify launching/search plus permitted MediaSession play/pause/next/previous/volume controls."
+    },
+    {
+      "id": 26,
+      "title": "Notification Reader and Reply Manager",
+      "phase": 4,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Explicit notification access, summaries and approved available reply actions with duplicate-send prevention."
+    },
+    {
+      "id": 27,
+      "title": "Screenshot and Screen Capture",
+      "phase": 4,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Consented Android screenshot/MediaProjection capture and saving where allowed, with actual save-result checks."
+    },
+    {
+      "id": 28,
+      "title": "Camera and Smart Vision",
+      "phase": 4,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Permission-based Camera Preview, Document Scanner, Object Recognition, Receipt Scanner, Medicine Label Reader and Handwriting Recognition."
+    },
+    {
+      "id": 29,
+      "title": "Accessibility Voice Control",
+      "phase": 5,
+      "status": "PARTIAL",
+      "boundary": "Existing optional user-enabled selected-app tap/swipe/scroll/text and navigation retained, with confirmation and observed/unverified outcomes. Layout compatibility remains unverified.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Improve confirmed tap/swipe/scroll/text/Back/Home/app navigation with safe selectors and results."
+    },
+    {
+      "id": 30,
+      "title": "Multi-Step App Macros",
+      "phase": 5,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "User-defined multi-step app macros: launch, find control, enter text, navigate; confirmations, timeout, cancellation and progress."
+    },
+    {
+      "id": 31,
+      "title": "Smart Task Execution Engine",
+      "phase": 5,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Structured task planning, execution state, observable outcomes and retries only for safe idempotent operations."
+    },
+    {
+      "id": 32,
+      "title": "Voice Command Learning",
+      "phase": 5,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "User aliases for existing commands without granting arbitrary speech new permissions."
+    },
+    {
+      "id": 33,
+      "title": "Smart Clipboard Assistant",
+      "phase": 5,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "User-initiated clipboard operations, summary, translation and rewriting within Android clipboard restrictions."
+    },
+    {
+      "id": 34,
+      "title": "Advanced File Manager",
+      "phase": 5,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "SAF-selected files/folders with search, organization, rename/copy/delete and destructive-action confirmation."
+    },
+    {
+      "id": 35,
+      "title": "Smart Routines",
+      "phase": 5,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "User-configured briefings, supported phone settings, app launches and predefined routine sequences."
+    },
+    {
+      "id": 36,
+      "title": "Alarms and Reminders",
+      "phase": 5,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Real OS alarms/reminders, scheduling/notification permissions and behavior when closed subject to OS constraints."
+    },
+    {
+      "id": 37,
+      "title": "Screen Understanding Assistant",
+      "phase": 6,
+      "status": "PARTIAL",
+      "boundary": "Only bounded transient accessibility-node checks for confirmed actions. No general screen summarizer or screenshot pipeline.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "User-approved visible screen inspection, summaries and control explanations; no invalid continuous-access claim."
+    },
+    {
+      "id": 38,
+      "title": "PDF and Document Reader",
+      "phase": 6,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Selected PDF/text opening, supported extraction, page summaries and voice reading."
+    },
+    {
+      "id": 39,
+      "title": "QR and Barcode Scanner",
+      "phase": 6,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Camera-permitted QR/barcodes with safe URLs, contact-card and product-code handling."
+    },
+    {
+      "id": 40,
+      "title": "Receipt Scanner and Expense Tracker",
+      "phase": 6,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Receipt total/date/merchant extraction, user corrections and approved local expense records."
+    },
+    {
+      "id": 41,
+      "title": "Real-Time Voice Captions",
+      "phase": 6,
+      "status": "PARTIAL",
+      "boundary": "Live input/output transcription captions in the foreground session only. No continuous independent caption utility; recognition needs provider/phone tests.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Supported live speech and response captions during conversations."
+    },
+    {
+      "id": 42,
+      "title": "Live Translator and Interpreter",
+      "phase": 6,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Bengali/English/Hindi/Tagalog/Indonesian translation and additional supported languages, with voice output."
+    },
+    {
+      "id": 43,
+      "title": "Weather, News and Information",
+      "phase": 6,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Permission-based location or manual city weather, sourced news/information and current answers only when real network data is available."
+    },
+    {
+      "id": 44,
+      "title": "Interactive Learning Assistant",
+      "phase": 6,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Quizzes, explanations, language practice, study reminders and personalized exercises."
+    },
+    {
+      "id": 45,
+      "title": "Original Animated Home Interface",
+      "phase": 7,
+      "status": "PARTIAL",
+      "boundary": "Original existing Compose home preserved and Voice screen added. Futuristic orb/waveform/transitions are planned.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Original full-screen futuristic black/purple/blue/cyan UI, orb, transitions and real voice waveform; no copied assets."
+    },
+    {
+      "id": 46,
+      "title": "Avatar Customization",
+      "phase": 7,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Independent avatar/color/theme/animation choices; no protected third-party character models/assets without permission."
+    },
+    {
+      "id": 47,
+      "title": "Floating Jerry Shortcut",
+      "phase": 7,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Permission-based draggable/dismissible floating Jerry shortcut and quick voice activation where Android permits."
+    },
+    {
+      "id": 48,
+      "title": "Advanced Settings Dashboard",
+      "phase": 7,
+      "status": "PARTIAL",
+      "boundary": "Existing themes/settings plus Voice model/key/language/persona configuration. Memory, notifications, security and backup dashboards expand in later phases.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Voice, AI Model, API Key, Language, Theme, Automation, Notifications, Memory, Security, Backup and About settings sections."
+    },
+    {
+      "id": 49,
+      "title": "Permission Diagnostics Dashboard",
+      "phase": 7,
+      "status": "PARTIAL",
+      "boundary": "Real declared/runtime microphone state, other permission states and accessibility-session diagnostics. Camera/capture/notification feature flows remain pending.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Real microphone/notification/accessibility/camera/screen-capture/other states and supported enablement guidance."
+    },
+    {
+      "id": 50,
+      "title": "AI Self-Diagnostics and Recovery",
+      "phase": 7,
+      "status": "PARTIAL",
+      "boundary": "Sanitized Live network/auth/model/quota failures, retry states, microphone/focus handling and existing command diagnostics. Structured diagnostic export/self-repair remains pending.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "API/network/reconnect/permission/background-service diagnostics, structured privacy-safe logs and troubleshooting."
+    },
+    {
+      "id": 51,
+      "title": "Security and Owner Protection",
+      "phase": 7,
+      "status": "PARTIAL",
+      "boundary": "Keystore-backed API-key encryption, explicit microphone start, scoped confirmations/password checks and no automatic AI device tools. Owner biometrics and broader privacy alerts remain pending.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Optional owner verification, secure settings, privacy controls and visible alerts; camera/biometrics only with consent; no covert capture or lock-screen bypass."
+    },
+    {
+      "id": 52,
+      "title": "Backup, Restore and Data Migration",
+      "phase": 7,
+      "status": "PLANNED",
+      "boundary": "Not implemented. Retained in the structured backlog; no working or device-verification claim.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Versioned local data export/import, validation, conflict handling, rollback and non-destructive migrations preserving existing memories."
+    },
+    {
+      "id": 53,
+      "title": "About Me, Ownership and Legal Notices",
+      "phase": 7,
+      "status": "IMPLEMENTED_DEVICE_UNVERIFIED",
+      "boundary": "Original ownership/About UI, correct app identity, proprietary original-material notice and preserved third-party licenses. Phone rendering still unverified.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Run real provider/device acceptance and address any failures.",
+      "approved_requirements": "App Jerry AI Original; original project owner/publisher Tanim Boss; proprietary original-contribution notice and required third-party notices."
+    },
+    {
+      "id": 54,
+      "title": "Complete Feature Status, Testing and Updates",
+      "phase": 7,
+      "status": "PARTIAL",
+      "boundary": "All 54 groups and six truthful status categories, structured backlog, version/change documentation, local tests/build evidence and workflow. Device verification and updater are pending.",
+      "device_evidence": null,
+      "acceptance": "Physical Android acceptance and provider evidence where applicable; see TEST_CHECKLIST.md.",
+      "next_work": "Implement remaining behavior and tests without dropping the approved inventory.",
+      "approved_requirements": "Honest six-state feature dashboard, build results, version/changelog, diagnostics and update information; never fabricate device evidence."
+    }
+  ],
+  "global_requirements": [
+    "Existing app and application ID remain com.tanimboss.jerryai; original owner/publisher Tanim Boss.",
+    "Native supported APIs/intents first; explicit confirmation for messages, calls and sensitive/destructive effects.",
+    "Every applicable feature should expose supported voice input including equivalent Bengali phrases where technically feasible.",
+    "No private credentials/data in source, logs or artifacts. Preserve third-party licenses and independent implementation.",
+    "Never erase existing memories during migration; backup, validate, confirm conflicts and support rollback.",
+    "Each phase requires real code, meaningful tests, lint, APK identity verification, physical-phone checklist and honest incomplete/unsupported status.",
+    "Commit/push only authorized feature branch. No main merge, other-repository changes or production release without explicit permission."
+  ],
+  "voice_examples": [
+    {
+      "english": "Hey Jerry, open WhatsApp.",
+      "bengali": "জেরি, হোয়াটসঅ্যাপ খোলো।",
+      "status": "Phase 4 spoken-name integration pending; legacy selected-app Actions available separately."
+    },
+    {
+      "english": "Jerry, open YouTube and search for music.",
+      "bengali": "জেরি, ইউটিউব খুলে গান খোঁজো।",
+      "status": "Phase 4 results/playback integration pending."
+    },
+    {
+      "english": "Jerry, turn on the flashlight.",
+      "bengali": "জেরি, টর্চ চালু করো।",
+      "status": "Phase 2/4 local control pending."
+    },
+    {
+      "english": "Jerry, set media volume to 30 percent.",
+      "bengali": "জেরি, মিডিয়া ভলিউম তিরিশ শতাংশ করো।",
+      "status": "Phase 2/4 pending."
+    },
+    {
+      "english": "Jerry, read my approved notifications.",
+      "bengali": "জেরি, আমার অনুমোদিত নোটিফিকেশন পড়ো।",
+      "status": "Phase 4 explicit notification access pending."
+    },
+    {
+      "english": "Jerry, remember this information.",
+      "bengali": "জেরি, এই তথ্য মনে রাখো।",
+      "status": "Phase 3 Room memory pending."
+    },
+    {
+      "english": "Jerry, what did I ask you to remember?",
+      "bengali": "জেরি, আমি তোমাকে কী মনে রাখতে বলেছিলাম?",
+      "status": "Phase 3 recall pending."
+    },
+    {
+      "english": "Jerry, translate this into Bengali.",
+      "bengali": "জেরি, এটা বাংলায় অনুবাদ করো।",
+      "status": "Live model can be asked, but dedicated verified translator remains Phase 6 pending."
+    },
+    {
+      "english": "Jerry, open the camera.",
+      "bengali": "জেরি, ক্যামেরা খোলো।",
+      "status": "Phase 4 named launch/camera pipeline pending."
+    },
+    {
+      "english": "Jerry, show my reminders.",
+      "bengali": "জেরি, আমার রিমাইন্ডার দেখাও।",
+      "status": "Phase 5 reminder manager pending."
+    },
+    {
+      "english": "Jerry, stop listening.",
+      "bengali": "জেরি শোনা বন্ধ করো।",
+      "status": "Implemented via recognized input transcript/turn boundary; requires real provider/phone verification. UI Stop works independently of provider recognition."
+    }
+  ]
+}

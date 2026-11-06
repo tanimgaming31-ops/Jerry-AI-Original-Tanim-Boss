@@ -12,8 +12,8 @@ android {
         applicationId = "com.tanimboss.jerryai"
         minSdk = 29
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.2.0-confirmed-actions"
+        versionCode = 3
+        versionName = "0.3.0-live-voice"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
@@ -35,6 +35,11 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation("com.squareup.okhttp3:okhttp:5.3.2")
+    implementation("com.google.code.gson:gson:2.15.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver3:5.3.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation(platform("androidx.compose:compose-bom:2025.10.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
