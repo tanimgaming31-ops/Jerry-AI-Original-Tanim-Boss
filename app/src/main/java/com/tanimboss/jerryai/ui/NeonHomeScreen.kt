@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -121,9 +123,9 @@ internal fun JerryNeonHomeScreen(
 
             NeonPanel {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("✦", color = Gold, fontSize = 29.sp)
+                    JerryRobotAvatar(Modifier.size(91.dp))
                     Spacer(Modifier.width(12.dp))
-                    Column {
+                    Column(Modifier.weight(1f)) {
                         Text("Hey, I'm Jerry", fontSize = 19.sp, color = Gold, fontWeight = FontWeight.Bold)
                         Text("Voice • Smart Actions • Privacy-first controls",
                             color = Color.White, fontSize = 11.sp)
@@ -206,6 +208,46 @@ internal fun JerryNeonHomeScreen(
             BottomNeonItem("▦", "Tools", false, Modifier.weight(1f)) { onOpen("ACTIONS") }
             BottomNeonItem("♙", "Profile", false, Modifier.weight(1f)) { onOpen("ABOUT") }
         }
+    }
+}
+
+
+/** A small original robot/headset portrait drawn natively, never a cropped third-party image. */
+@Composable
+private fun JerryRobotAvatar(modifier: Modifier) {
+    Canvas(modifier) {
+        val w = size.width
+        val h = size.height
+        drawCircle(brush = Brush.radialGradient(listOf(Rose.copy(alpha = 0.36f), Color.Transparent)),
+            radius = w * 0.56f, center = Offset(w * .5f, h * .46f))
+        // Rounded metallic shoulders and neck.
+        drawRoundRect(brush = Brush.linearGradient(listOf(GoldDeep, Rose, Color(0xFF481637))),
+            topLeft = Offset(w * .13f, h * .68f), size = Size(w * .74f, h * .27f),
+            cornerRadius = CornerRadius(w * .14f))
+        drawRoundRect(color = Color(0xFF171020), topLeft = Offset(w * .36f, h * .65f),
+            size = Size(w * .28f, h * .14f), cornerRadius = CornerRadius(w * .08f))
+        // Helmet, faceplate and gold headphone speakers.
+        drawRoundRect(brush = Brush.linearGradient(listOf(RoseLight, Color(0xFF7C3276), Gold)),
+            topLeft = Offset(w * .23f, h * .11f), size = Size(w * .54f, h * .59f),
+            cornerRadius = CornerRadius(w * .21f))
+        drawRoundRect(brush = Brush.linearGradient(listOf(Color(0xFF2E152A), Color(0xFF08070D))),
+            topLeft = Offset(w * .27f, h * .22f), size = Size(w * .46f, h * .35f),
+            cornerRadius = CornerRadius(w * .15f))
+        for (x in listOf(.20f, .80f)) {
+            drawCircle(color = Gold, radius = w * .125f, center = Offset(w * x, h * .43f),
+                style = Stroke(width = 3.dp.toPx()))
+            drawCircle(color = Color(0xFF7A284D), radius = w * .081f, center = Offset(w * x, h * .43f))
+            drawCircle(color = GoldDeep, radius = w * .045f, center = Offset(w * x, h * .43f))
+        }
+        // Two lit visor eyes.
+        for (x in listOf(.42f, .59f)) {
+            drawRoundRect(color = RoseLight, topLeft = Offset(w * x - w * .055f, h * .355f),
+                size = Size(w * .11f, h * .055f), cornerRadius = CornerRadius(w * .027f))
+        }
+        // Center chest emitter and antenna.
+        drawCircle(color = Gold, radius = w * .052f, center = Offset(w * .5f, h * .82f))
+        drawCircle(color = Color(0xFF1B0A18), radius = w * .029f, center = Offset(w * .5f, h * .82f))
+        drawCircle(color = RoseLight, radius = w * .032f, center = Offset(w * .67f, h * .09f))
     }
 }
 
