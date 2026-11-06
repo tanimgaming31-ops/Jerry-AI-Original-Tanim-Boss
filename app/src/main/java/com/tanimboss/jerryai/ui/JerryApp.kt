@@ -215,7 +215,7 @@ fun JerryApp(viewModel: JerryViewModel) {
                 },
                 confirmButton = {
                     TextButton(enabled = youtubeQuery.isNotBlank(), onClick = {
-                        val uri = Uri.parse("https://www.youtube.com/results?search_query=" + Uri.encode(youtubeQuery.trim()))
+                        val uri = ("https://www.youtube.com/results?search_query=" + Uri.encode(youtubeQuery.trim())).toUri()
                         try {
                             context.startActivity(Intent(Intent.ACTION_VIEW, uri))
                             navigationError = null
