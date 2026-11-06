@@ -3,6 +3,9 @@ package com.tanimboss.jerryai.ui
 
 import android.content.ActivityNotFoundException
 import android.Manifest
+import android.app.Activity
+import android.net.Uri
+import android.provider.ContactsContract
 import android.content.pm.PackageManager
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -64,6 +67,8 @@ fun JerryApp(viewModel: JerryViewModel) {
     val context = LocalContext.current
     var selected by rememberSaveable { mutableStateOf(Page.HOME.name) }
     var navigationError by remember { mutableStateOf<String?>(null) }
+    var youtubeSearchOpen by remember { mutableStateOf(false) }
+    var youtubeQuery by remember { mutableStateOf("") }
     val page = Page.entries.firstOrNull { it.name == selected } ?: Page.HOME
 
     val microphone = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -90,8 +95,65 @@ fun JerryApp(viewModel: JerryViewModel) {
             }
         }
     }
+    val contactPicker = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            try {
+                val uri = result.data?.data
+                if (uri != null) {
+                    val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                    val phone = context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+                        if (cursor.moveToFirst()) {
+                            val index = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                            if (index >= 0) cursor.getString(index) else null
+                        } else null
+                    }
+                    if (!phone.isNullOrBlank()) {
+                        context.startActivity(Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null)))
+                        navigationError = null
+                    } else {
+                        navigationError = "Selected contact has no available phone number."
+                        selected = Page.ACTIONS.name
+                    }
+                }
+            } catch (_: ActivityNotFoundException) {
+                navigationError = "No phone dialer is installed."
+                selected = Page.ACTIONS.name
+            } catch (_: SecurityException) {
+                navigationError = "Contact selection was denied by Android."
+                selected = Page.ACTIONS.name
+            }
+        }
+    }
     val navigate: (String) -> Unit = { destination ->
         when (destination) {
+            "CONTACTS" -> {
+                try {
+                    contactPicker.launch(Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI))
+                } catch (_: ActivityNotFoundException) {
+                    navigationError = "No contacts picker is available."
+                    selected = Page.ACTIONS.name
+                } catch (_: SecurityException) {
+                    navigationError = "Android blocked contact selection."
+                    selected = Page.ACTIONS.name
+                }
+            }
+            "WHATSAPP" -> {
+                val intent = context.packageManager.getLaunchIntentForPackage("com.whatsapp")
+                    ?: context.packageManager.getLaunchIntentForPackage("com.whatsapp.w4b")
+                if (intent != null) {
+                    try {
+                        context.startActivity(intent)
+                        navigationError = null
+                    } catch (_: Exception) {
+                        navigationError = "WhatsApp could not be opened. Try the confirmed Actions screen."
+                        selected = Page.ACTIONS.name
+                    }
+                } else {
+                    navigationError = "WhatsApp is not discoverable. Try the confirmed Actions app picker."
+                    selected = Page.ACTIONS.name
+                }
+            }
+            "YOUTUBE" -> { youtubeSearchOpen = true }
             "DOCS" -> documents.launch(arrayOf("application/pdf", "text/plain", "image/*"))
             "CAMERA" -> {
                 try {
@@ -136,6 +198,42 @@ fun JerryApp(viewModel: JerryViewModel) {
     }
 
     MaterialTheme(colorScheme = DarkColors) {
+        if (youtubeSearchOpen) {
+            AlertDialog(
+                onDismissRequest = { youtubeSearchOpen = false },
+                title = { Text("Search YouTube") },
+                text = {
+                    Column {
+                        OutlinedTextField(
+                            value = youtubeQuery,
+                            onValueChange = { youtubeQuery = it.take(180) },
+                            label = { Text("Video or music title") },
+                            singleLine = true,
+                        )
+                        Text("This opens the real YouTube search page; playback is not automatically verified.")
+                    }
+                },
+                confirmButton = {
+                    TextButton(enabled = youtubeQuery.isNotBlank(), onClick = {
+                        val uri = Uri.parse("https://www.youtube.com/results?search_query=" + Uri.encode(youtubeQuery.trim()))
+                        try {
+                            context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+                            navigationError = null
+                        } catch (_: ActivityNotFoundException) {
+                            navigationError = "No browser or YouTube viewer is available."
+                            selected = Page.FEATURES.name
+                        } catch (_: SecurityException) {
+                            navigationError = "Android blocked opening YouTube."
+                            selected = Page.FEATURES.name
+                        }
+                        youtubeSearchOpen = false
+                    }) { Text("Search") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { youtubeSearchOpen = false }) { Text("Cancel") }
+                },
+            )
+        }
         when (page) {
             Page.HOME -> JerryNeonHomeScreen(
                 voicePhase = voiceState.phase, keyConfigured = voicePreferences.keyPresent,
