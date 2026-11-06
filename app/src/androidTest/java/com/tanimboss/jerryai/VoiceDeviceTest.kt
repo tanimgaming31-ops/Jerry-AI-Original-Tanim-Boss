@@ -17,7 +17,8 @@ import java.util.UUID
 class VoiceDeviceTest {
     @get:Rule val compose=createAndroidComposeRule<MainActivity>()
     @Test fun voiceScreenOpensAndStopsWithoutGrantingMicrophone() {
-        compose.onNodeWithText("Voice",useUnmergedTree=true).performClick()
+        compose.onNodeWithText("⚙", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("Voice & Wake Word", useUnmergedTree = true).performClick()
         compose.onNodeWithText("Gemini Live voice").assertIsDisplayed()
         // Test never enters a real key, requests microphone, or contacts Gemini.
         compose.onNodeWithText("Stop voice").performScrollTo().performClick()

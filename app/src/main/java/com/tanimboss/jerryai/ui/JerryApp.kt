@@ -2,6 +2,15 @@
 package com.tanimboss.jerryai.ui
 
 import android.content.ActivityNotFoundException
+import android.Manifest
+import android.app.Activity
+import android.net.Uri
+import android.provider.ContactsContract
+import android.content.pm.PackageManager
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.tanimboss.jerryai.voice.VoicePhase
 import android.content.Intent
 import androidx.core.net.toUri
 import android.os.Build
@@ -33,14 +42,19 @@ import com.tanimboss.jerryai.catalog.ImplementationState
 import com.tanimboss.jerryai.diagnostics.readPermissionDiagnostics
 import com.tanimboss.jerryai.settings.ThemeMode
 
-private val LightColors = lightColorScheme(
-    primary = Color(0xFF006B60), secondary = Color(0xFF426660),
-    background = Color(0xFFF4FAF7), surface = Color(0xFFF4FAF7),
-)
 private val DarkColors = darkColorScheme(
-    primary = Color(0xFF74E0CF), secondary = Color(0xFFA9CCC3),
-    background = Color(0xFF0C1918), surface = Color(0xFF0C1918),
+    primary = Color(0xFFFFCE77),
+    onPrimary = Color(0xFF23091D),
+    secondary = Color(0xFFFF3499),
+    background = Color(0xFF0E0413),
+    onBackground = Color.White,
+    surface = Color(0xFF2B1029),
+    onSurface = Color.White,
+    surfaceVariant = Color(0xFF451C38),
+    onSurfaceVariant = Color(0xFFEFD9E8),
+    outline = Color(0xFFBD5787),
 )
+
 private enum class Page(val title: String) { HOME("Home"), VOICE("Voice"), CHAT("Chat"), MEMORY("Memory"), ACTIONS("Actions"), FEATURES("Features"), SETTINGS("Settings"), DIAGNOSTICS("Diagnostics"), ABOUT("About") }
 
 @Composable
@@ -48,78 +62,212 @@ fun JerryApp(viewModel: JerryViewModel) {
     val actionsViewModel = viewModel<ActionsViewModel>()
     val voiceViewModel = viewModel<VoiceViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val dark = when (state.settings.theme) {
-        ThemeMode.SYSTEM -> isSystemInDarkTheme()
-        ThemeMode.LIGHT -> false
-        ThemeMode.DARK -> true
+    val voiceState by voiceViewModel.state.collectAsStateWithLifecycle()
+    val voicePreferences by voiceViewModel.preferences.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var selected by rememberSaveable { mutableStateOf(Page.HOME.name) }
+    var navigationError by remember { mutableStateOf<String?>(null) }
+    var youtubeSearchOpen by remember { mutableStateOf(false) }
+    var youtubeQuery by remember { mutableStateOf("") }
+    val page = Page.entries.firstOrNull { it.name == selected } ?: Page.HOME
+
+    val microphone = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) voiceViewModel.start()
+        else {
+            voiceViewModel.message("Microphone permission denied. No audio was captured.")
+            selected = Page.VOICE.name
+        }
     }
-    MaterialTheme(colorScheme = if (dark) DarkColors else LightColors) {
-        var selected by rememberSaveable { mutableStateOf(Page.HOME.name) }
-        val page = Page.entries.firstOrNull { it.name == selected } ?: Page.HOME
-        val voiceState by voiceViewModel.state.collectAsStateWithLifecycle()
-        val voicePreferences by voiceViewModel.preferences.collectAsStateWithLifecycle()
-        if (page == Page.HOME) {
-            JerryNeonHomeScreen(voicePhase = voiceState.phase, keyConfigured = voicePreferences.keyPresent) { destination ->
-                if (Page.entries.any { it.name == destination }) selected = destination
+    val documents = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            try {
+                val mime = context.contentResolver.getType(uri) ?: "application/octet-stream"
+                context.startActivity(Intent(Intent.ACTION_VIEW)
+                    .setDataAndType(uri, mime)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
+                navigationError = null
+            } catch (_: ActivityNotFoundException) {
+                navigationError = "No suitable document viewer is installed."
+                selected = Page.FEATURES.name
+            } catch (_: SecurityException) {
+                navigationError = "Android blocked opening the selected document."
+                selected = Page.FEATURES.name
             }
-        } else Scaffold { padding ->
-            Column(Modifier.fillMaxSize().padding(padding)) {
-                Column(Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
-                    Text("JERRY / ORIGINAL", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-                    Text("Jerry AI Original", style = MaterialTheme.typography.headlineSmall)
-                }
-                // Two short rows stay usable on narrow phones and at large font sizes.
-                Page.entries.chunked(3).forEach { row ->
-                    Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        row.forEach { destination ->
-                            FilterChip(
-                                selected = page == destination,
-                                onClick = { selected = destination.name },
-                                label = { Text(destination.title) },
-                                modifier = Modifier.weight(1f),
-                            )
-                        }
+        }
+    }
+    val contactPicker = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            try {
+                val uri = result.data?.data
+                if (uri != null) {
+                    val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                    val phone = context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+                        if (cursor.moveToFirst()) {
+                            val index = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                            if (index >= 0) cursor.getString(index) else null
+                        } else null
+                    }
+                    if (!phone.isNullOrBlank()) {
+                        context.startActivity(Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null)))
+                        navigationError = null
+                    } else {
+                        navigationError = "Selected contact has no available phone number."
+                        selected = Page.ACTIONS.name
                     }
                 }
-                key(page) {
-                    Column(
-                        Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                        when (page) {
-                            Page.HOME -> Home()
-                            Page.CHAT -> {
-                                Text("AI Chat • planned", style = MaterialTheme.typography.headlineSmall)
-                                InformationCard("Not implemented yet",
-                                    "Text AI chat and conversation history are in the Phase 3 backlog. This screen does not send prompts or simulate responses.")
-                            }
-                            Page.MEMORY -> {
-                                Text("Memory Bank • planned", style = MaterialTheme.typography.headlineSmall)
-                                InformationCard("No memories are stored here yet",
-                                    "Room memory, personal learning and backup/restore are planned for Phase 3. Your existing settings and voice key remain unchanged.")
-                            }
-                            Page.FEATURES -> Features()
-                            Page.SETTINGS -> {
-                                Text("Appearance", style = MaterialTheme.typography.headlineSmall)
-                                Text("Choose a theme. This preference stays on this device.")
-                                if (state.loading) Text("Loading settings…")
-                                ThemeMode.entries.forEach { theme ->
-                                    FilterChip(
-                                        selected = state.settings.theme == theme,
-                                        enabled = !state.loading,
-                                        onClick = { viewModel.setTheme(theme) },
-                                        label = { Text("${theme.label} theme") },
-                                    )
-                                }
-                                Text("Gemini Live model, voice, language, persona and encrypted API key are configured on the Voice page. Memory settings are not available yet.")
-                            }
-                            Page.DIAGNOSTICS -> Diagnostics()
-                            Page.ABOUT -> About()
-                            Page.ACTIONS -> ActionsScreen(actionsViewModel)
-                            Page.VOICE -> VoiceScreen(voiceViewModel)
-                        }
+            } catch (_: ActivityNotFoundException) {
+                navigationError = "No phone dialer is installed."
+                selected = Page.ACTIONS.name
+            } catch (_: SecurityException) {
+                navigationError = "Contact selection was denied by Android."
+                selected = Page.ACTIONS.name
+            }
+        }
+    }
+    val navigate: (String) -> Unit = { destination ->
+        when (destination) {
+            "CONTACTS" -> {
+                try {
+                    contactPicker.launch(Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI))
+                } catch (_: ActivityNotFoundException) {
+                    navigationError = "No contacts picker is available."
+                    selected = Page.ACTIONS.name
+                } catch (_: SecurityException) {
+                    navigationError = "Android blocked contact selection."
+                    selected = Page.ACTIONS.name
+                }
+            }
+            "WHATSAPP" -> {
+                val intent = context.packageManager.getLaunchIntentForPackage("com.whatsapp")
+                    ?: context.packageManager.getLaunchIntentForPackage("com.whatsapp.w4b")
+                if (intent != null) {
+                    try {
+                        context.startActivity(intent)
+                        navigationError = null
+                    } catch (_: Exception) {
+                        navigationError = "WhatsApp could not be opened. Try the confirmed Actions screen."
+                        selected = Page.ACTIONS.name
                     }
+                } else {
+                    navigationError = "WhatsApp is not discoverable. Try the confirmed Actions app picker."
+                    selected = Page.ACTIONS.name
+                }
+            }
+            "YOUTUBE" -> { youtubeSearchOpen = true }
+            "DOCS" -> documents.launch(arrayOf("application/pdf", "text/plain", "image/*"))
+            "CAMERA" -> {
+                try {
+                    context.startActivity(Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA))
+                    navigationError = null
+                } catch (_: ActivityNotFoundException) {
+                    navigationError = "No camera application is available."
+                    selected = Page.DIAGNOSTICS.name
+                } catch (_: SecurityException) {
+                    navigationError = "Android blocked opening the camera."
+                    selected = Page.DIAGNOSTICS.name
+                }
+            }
+            else -> Page.entries.firstOrNull { it.name == destination }?.let { selected = it.name }
+        }
+    }
+    val openNotifications: () -> Unit = {
+        try {
+            context.startActivity(
+                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+            )
+            navigationError = null
+        } catch (_: ActivityNotFoundException) {
+            navigationError = "This Android device has no supported notification settings screen."
+            selected = Page.DIAGNOSTICS.name
+        } catch (_: SecurityException) {
+            navigationError = "Android denied notification settings."
+            selected = Page.DIAGNOSTICS.name
+        }
+    }
+    val startFromMic: () -> Unit = {
+        if (voiceState.phase !in listOf(VoicePhase.IDLE, VoicePhase.ERROR)) {
+            selected = Page.VOICE.name
+        } else if (!voicePreferences.keyPresent || !voicePreferences.config.valid()) {
+            selected = Page.VOICE.name
+        } else if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            voiceViewModel.start()
+        } else {
+            microphone.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
+
+    MaterialTheme(colorScheme = DarkColors) {
+        if (youtubeSearchOpen) {
+            AlertDialog(
+                onDismissRequest = { youtubeSearchOpen = false },
+                title = { Text("Search YouTube") },
+                text = {
+                    Column {
+                        OutlinedTextField(
+                            value = youtubeQuery,
+                            onValueChange = { youtubeQuery = it.take(180) },
+                            label = { Text("Video or music title") },
+                            singleLine = true,
+                        )
+                        Text("This opens the real YouTube search page; playback is not automatically verified.")
+                    }
+                },
+                confirmButton = {
+                    TextButton(enabled = youtubeQuery.isNotBlank(), onClick = {
+                        val uri = ("https://www.youtube.com/results?search_query=" + Uri.encode(youtubeQuery.trim())).toUri()
+                        try {
+                            context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+                            navigationError = null
+                        } catch (_: ActivityNotFoundException) {
+                            navigationError = "No browser or YouTube viewer is available."
+                            selected = Page.FEATURES.name
+                        } catch (_: SecurityException) {
+                            navigationError = "Android blocked opening YouTube."
+                            selected = Page.FEATURES.name
+                        }
+                        youtubeSearchOpen = false
+                    }) { Text("Search") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { youtubeSearchOpen = false }) { Text("Cancel") }
+                },
+            )
+        }
+        when (page) {
+            Page.HOME -> JerryNeonHomeScreen(
+                voicePhase = voiceState.phase, keyConfigured = voicePreferences.keyPresent,
+                onOpen = navigate, onMic = startFromMic,
+            )
+            Page.SETTINGS -> JerryNeonSettingsScreen(
+                theme = state.settings.theme,
+                voicePhase = voiceState.phase,
+                keyConfigured = voicePreferences.keyPresent,
+                language = com.tanimboss.jerryai.voice.VoiceConfig.languages[voicePreferences.config.language] ?: "English",
+                onThemeChange = viewModel::setTheme,
+                onOpen = navigate,
+                onNotifications = openNotifications,
+            )
+            else -> JerryNeonPageShell(title = page.title, current = page.name, onOpen = navigate) {
+                navigationError?.let { JerryNeonInfoCard("Android action", it) }
+                state.error?.let { JerryNeonInfoCard("Settings error", it) }
+                when (page) {
+                    Page.CHAT -> JerryNeonInfoCard(
+                        "AI Chat is not ready yet",
+                        "The Chat and conversation history implementation belongs to Phase 3. Voice chat is available on the separate Voice screen, subject to your key and provider access.",
+                        onClick = { selected = Page.VOICE.name },
+                    )
+                    Page.MEMORY -> {
+                        JerryNeonInfoCard("Memory Bank • planned",
+                            "Room memory and backup/restore are not implemented. No existing personal memory or settings were deleted. Do not mistake this design for a functioning backup.")
+                        JerryNeonInfoCard("Privacy", "Your Gemini key stays encrypted in Android Keystore, outside backups. Gemini voice audio goes to the selected provider only after you start a session.")
+                    }
+                    Page.VOICE -> VoiceScreen(voiceViewModel)
+                    Page.ACTIONS -> ActionsScreen(actionsViewModel)
+                    Page.FEATURES -> Features()
+                    Page.DIAGNOSTICS -> Diagnostics()
+                    Page.ABOUT -> About()
+                    Page.HOME, Page.SETTINGS -> Unit
                 }
             }
         }
@@ -128,12 +276,7 @@ fun JerryApp(viewModel: JerryViewModel) {
 
 @Composable
 private fun InformationCard(title: String, body: String) {
-    Card(shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(body)
-        }
-    }
+    JerryNeonInfoCard(title, body)
 }
 
 @Composable

@@ -54,6 +54,7 @@ internal fun JerryNeonHomeScreen(
     voicePhase: VoicePhase,
     keyConfigured: Boolean,
     onOpen: (String) -> Unit,
+    onMic: () -> Unit,
 ) {
     val live = homeLiveStatus(voicePhase)
     val activeLabel = when (voicePhase) {
@@ -75,7 +76,7 @@ internal fun JerryNeonHomeScreen(
         Column(
             Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Box(
@@ -102,7 +103,7 @@ internal fun JerryNeonHomeScreen(
             }
 
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                JerryAnimatedOrb(Modifier.size(230.dp), voicePhase)
+                JerryAnimatedOrb(Modifier.size(204.dp), voicePhase)
                 AnimatedWave(Modifier.fillMaxWidth(0.73f).height(35.dp), voicePhase)
                 Text(activeLabel, color = if (live.active) RoseLight else Gold, fontWeight = FontWeight.Bold, fontSize = 22.sp)
                 Spacer(Modifier.height(3.dp))
@@ -121,100 +122,40 @@ internal fun JerryNeonHomeScreen(
                 }
             }
 
-            NeonPanel {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    JerryRobotAvatar(Modifier.size(91.dp))
-                    Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text("Hey, I'm Jerry", fontSize = 19.sp, color = Gold, fontWeight = FontWeight.Bold)
-                        Text("Voice • Smart Actions • Privacy-first controls",
-                            color = Color.White, fontSize = 11.sp)
-                        Text("Voice is foreground-only. More features are in development.",
-                            color = Muted, fontSize = 10.sp)
-                    }
-                }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                NeonShortcut("🚀", "Open Apps", "Confirm", Modifier.weight(1f)) { onOpen("ACTIONS") }
+                NeonShortcut("☎", "Call Contact", "Select", Modifier.weight(1f)) { onOpen("CONTACTS") }
+                NeonShortcut("◌", "WhatsApp", "Open app", Modifier.weight(1f)) { onOpen("WHATSAPP") }
+                NeonShortcut("▶", "YouTube Search", "Search", Modifier.weight(1f)) { onOpen("YOUTUBE") }
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                NeonShortcut("🎙", "Voice Chat", "Available", Modifier.weight(1f)) { onOpen("VOICE") }
-                NeonShortcut("▣", "AI Chat", "Planned", Modifier.weight(1f)) { onOpen("CHAT") }
-                NeonShortcut("◉", "Memory", "Planned", Modifier.weight(1f)) { onOpen("MEMORY") }
-                NeonShortcut("▦", "Routines", "Planned", Modifier.weight(1f)) { onOpen("FEATURES") }
+                NeonShortcut("▣", "Camera & Scan", "Camera", Modifier.weight(1f)) { onOpen("CAMERA") }
+                NeonShortcut("▤", "Read Documents", "File picker", Modifier.weight(1f)) { onOpen("DOCS") }
+                NeonShortcut("A文", "Translate & Interpret", "Voice only", Modifier.weight(1f)) { onOpen("VOICE") }
+                NeonShortcut("▱", "More Tools", "View list", Modifier.weight(1f)) { onOpen("FEATURES") }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                NeonShortcut("↗", "Open Apps", "Confirm", Modifier.weight(1f)) { onOpen("ACTIONS") }
-                NeonShortcut("◌", "WhatsApp", "Planned", Modifier.weight(1f)) { onOpen("FEATURES") }
-                NeonShortcut("▶", "YouTube", "Planned", Modifier.weight(1f)) { onOpen("FEATURES") }
-                NeonShortcut("✧", "All Tools", "View list", Modifier.weight(1f)) { onOpen("FEATURES") }
-            }
-
-            NeonPanel {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("ϟ", color = Gold, fontSize = 24.sp)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Quick Actions", fontSize = 16.sp, color = Color.White, fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.weight(1f))
-                    Text("See all ›", color = Gold, modifier = Modifier.clickable { onOpen("FEATURES") }, fontSize = 11.sp)
-                }
-                Spacer(Modifier.height(5.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                    NeonTool("♜", "Flashlight", Modifier.weight(1f)) { onOpen("FEATURES") }
-                    NeonTool("◖))", "Volume", Modifier.weight(1f)) { onOpen("FEATURES") }
-                    NeonTool("☼", "Brightness", Modifier.weight(1f)) { onOpen("FEATURES") }
-                    NeonTool("▣", "Camera", Modifier.weight(1f)) { onOpen("FEATURES") }
-                    NeonTool("⊞", "Screenshot", Modifier.weight(1f)) { onOpen("FEATURES") }
-                }
-                Text("These five controls are planned, not active buttons yet.",
-                    color = Muted, fontSize = 10.sp)
-            }
-
-            NeonPanel {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("∿", color = Gold, fontSize = 24.sp)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Active Services", fontSize = 16.sp, color = Color.White, fontWeight = FontWeight.SemiBold)
-                }
-                NeonServiceRow("✦", "Gemini Live (AI Voice)", live.label,
-                    if (live.active) Mint else if (live.pending) Gold else Muted) { onOpen("VOICE") }
-                NeonServiceRow("◉", "Foreground Voice Service", "Not implemented", Muted) { onOpen("FEATURES") }
-                NeonServiceRow("◎", "Wake Word (Hey Jerry)", "Not implemented", Muted) { onOpen("FEATURES") }
-                NeonServiceRow("↗", "Offline Commands", "Limited / confirm", Gold) { onOpen("ACTIONS") }
-            }
-
-            NeonPanel(Modifier.clickable { onOpen("ABOUT") }) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("ⓘ", color = Gold, fontSize = 27.sp)
-                    Spacer(Modifier.width(10.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text("About Jerry AI Original", color = Color.White, fontWeight = FontWeight.SemiBold)
-                        Text("Independent Android AI project by Tanim Boss",
-                            color = Muted, fontSize = 11.sp)
-                    }
-                    Text("›", color = Gold, fontSize = 26.sp)
+            Box(Modifier.fillMaxWidth().padding(top = 5.dp, bottom = 3.dp), contentAlignment = Alignment.Center) {
+                Box(
+                    Modifier.size(90.dp).clip(CircleShape)
+                        .background(Brush.radialGradient(listOf(Color(0xFFCA337E), Color(0xFF521536), Color(0xFF210C24))))
+                        .border(3.dp, Brush.sweepGradient(listOf(Rose, Gold, RoseLight, GoldDeep, Rose)), CircleShape)
+                        .clickable(onClick = onMic),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("🎙", color = Gold, fontSize = 44.sp)
                 }
             }
             Spacer(Modifier.height(5.dp))
         }
-        Row(
-            Modifier.fillMaxWidth()
-                .background(Brush.verticalGradient(listOf(Color(0xE82B1027), Color(0xFF160716))))
-                .border(width = 1.dp, color = Color(0xAAEF6DAD), shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
-                .padding(horizontal = 6.dp, vertical = 9.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            BottomNeonItem("⌂", "Home", true, Modifier.weight(1f)) { onOpen("HOME") }
-            BottomNeonItem("▣", "Chat", false, Modifier.weight(1f)) { onOpen("CHAT") }
-            BottomNeonItem("◉", "Memory", false, Modifier.weight(1f)) { onOpen("MEMORY") }
-            BottomNeonItem("▦", "Tools", false, Modifier.weight(1f)) { onOpen("ACTIONS") }
-            BottomNeonItem("♙", "Profile", false, Modifier.weight(1f)) { onOpen("ABOUT") }
-        }
+        JerryNeonBottomNavigation("HOME", onOpen)
     }
 }
 
 
 /** A small original robot/headset portrait drawn natively, never a cropped third-party image. */
 @Composable
-private fun JerryRobotAvatar(modifier: Modifier) {
+internal fun JerryRobotAvatar(modifier: Modifier) {
     Canvas(modifier) {
         val w = size.width
         val h = size.height
@@ -284,7 +225,7 @@ private fun NeonPanel(modifier: Modifier = Modifier, content: @Composable Column
 @Composable
 private fun NeonShortcut(symbol: String, title: String, caption: String, modifier: Modifier, onClick: () -> Unit) {
     Column(
-        modifier.heightIn(min = 94.dp).clip(RoundedCornerShape(16.dp))
+        modifier.heightIn(min = 85.dp).clip(RoundedCornerShape(16.dp))
             .background(Brush.verticalGradient(listOf(Color(0xFF4A1838), Color(0xFF210D21))))
             .border(1.dp, Color(0xB6FA80B8), RoundedCornerShape(16.dp))
             .clickable(onClick = onClick).padding(horizontal = 3.dp, vertical = 9.dp),
