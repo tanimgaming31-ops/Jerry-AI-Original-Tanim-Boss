@@ -26,7 +26,7 @@ class FoundationDeviceTest {
         compose.onNodeWithText("Actions", useUnmergedTree = true).performClick()
         compose.onNodeWithText("Supported commands").assertIsDisplayed()
         compose.onNodeWithText("Home", useUnmergedTree = true).performClick()
-        compose.onNodeWithText("Voice is not active").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Foreground voice").performScrollTo().assertIsDisplayed()
     }
 
     @Test fun themeAndPageSurviveActivityRecreation() {
@@ -62,14 +62,17 @@ class FoundationDeviceTest {
     }
 
     @Suppress("DEPRECATION")
-    @Test fun foundationDeclaresNoSensitiveOrNetworkPermissions() {
+    @Test fun voiceBuildDeclaresOnlyExpectedPermissions() {
         val context = compose.activity
         val permissions = context.packageManager.getPackageInfo(context.packageName, PackageManager.GET_PERMISSIONS)
             .requestedPermissions.orEmpty().toSet()
         val forbidden = setOf(
-            "android.permission.INTERNET", "android.permission.RECORD_AUDIO", "android.permission.READ_CONTACTS",
+            "android.permission.READ_CONTACTS",
             "android.permission.CALL_PHONE", "android.permission.SEND_SMS", "android.permission.FOREGROUND_SERVICE_MICROPHONE",
         )
         assertTrue("Unexpected permission: ${permissions intersect forbidden}", (permissions intersect forbidden).isEmpty())
+        val required=setOf("android.permission.INTERNET", "android.permission.RECORD_AUDIO", "android.permission.MODIFY_AUDIO_SETTINGS")
+        assertTrue(permissions.containsAll(required))
+        assertTrue((permissions - required - "com.tanimboss.jerryai.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION").isEmpty())
     }
 }

@@ -81,3 +81,13 @@ test target, not personal messages or paid/destructive actions.
 
 Compiling these paths and passing JVM policy tests does not establish their actual
 behavior on Android. Update device evidence only after the corresponding checks run.
+
+## 0.3.0 foreground Live increment — NOT RUN ON A PHONE
+
+Use the complete Phase 1 checklist at ../TEST_CHECKLIST.md. The historical
+0.2.0 no-microphone/no-network assertions above are superseded for this version:
+INTERNET, RECORD_AUDIO and MODIFY_AUDIO_SETTINGS are now required, with runtime
+microphone consent only after explicit Start. Sensitive call/contact/SMS/overlay/
+camera permissions and microphone foreground-service capability remain absent.
+Six instrumentation scenarios compile, including isolated Keystore integrity and
+Voice-screen entry/Stop. No provider or device result is established by compilation.

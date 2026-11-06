@@ -69,3 +69,11 @@ stores no API keys. Backups are disabled and storage-domain transfer exclusions
 remain explicit. The debug APK is a development build, not a hardened release.
 Future Gemini keys require Keystore-backed protection and exclusion from backups,
 source, build artifacts, logs and exports; no provider credential is embedded now.
+
+## 0.3.0 Phase 1 increment
+
+The confirmed-action architecture above remains intact. New foreground voice and
+secure voice preferences are documented in VOICE_ARCHITECTURE.md. Internet,
+RECORD_AUDIO and MODIFY_AUDIO_SETTINGS are now required for explicit foreground
+Gemini sessions; the earlier no-microphone/network description applies to 0.2.0
+only. No FGS/background microphone, wake word or automatic AI device tool was added.

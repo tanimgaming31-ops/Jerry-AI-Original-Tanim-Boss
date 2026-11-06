@@ -31,7 +31,7 @@ fun readPermissionDiagnostics(context: Context): List<PermissionDiagnostic> {
         reason,
     )
     return listOf(
-        entry("Microphone", Manifest.permission.RECORD_AUDIO, "For future voice sessions. No audio is captured in this build."),
+        entry("Microphone", Manifest.permission.RECORD_AUDIO, "Used only for an explicitly started foreground Gemini voice session. Mute/Stop or leaving the app stops capture."),
         entry("Contacts", Manifest.permission.READ_CONTACTS, "For future contact lookup. Contacts are not read in this build."),
         entry("Calls", Manifest.permission.CALL_PHONE, "For future confirmed calling actions. Calls are not placed in this build."),
         if (Build.VERSION.SDK_INT >= 33) {

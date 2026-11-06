@@ -8,7 +8,9 @@ proprietary project license does not replace any third-party license.
 | Component family | Upstream attribution | License |
 | --- | --- | --- |
 | AndroidX Activity, Compose, Material 3, Lifecycle, DataStore, and transitive AndroidX libraries | The Android Open Source Project / AndroidX authors | Apache-2.0 |
-| Okio (transitive DataStore dependency) | Copyright 2013 Square, Inc. and contributors | Apache-2.0 |
+| OkHttp 5.3.2 (Live WebSocket/HTTPS), MockWebServer 5.3.2 (test only) | Square, Inc. and contributors | Apache-2.0 |
+| Gson 2.15.0 | Google Inc. and contributors | Apache-2.0 |
+| Okio (transitive DataStore/OkHttp dependency) | Copyright 2013 Square, Inc. and contributors | Apache-2.0 |
 | Shaded Protocol Buffers (DataStore preferences) | Copyright 2008 Google Inc. and contributors | BSD-3-Clause (licenses/Protobuf-BSD-3-Clause.txt) |
 | Kotlin standard library and Kotlin annotations | JetBrains s.r.o. and Kotlin contributors | Apache-2.0 |
 | kotlinx.coroutines | JetBrains s.r.o. and contributors | Apache-2.0 |
@@ -40,5 +42,4 @@ Tanim Boss code. Java and Android SDK tools are installed separately, under thei
 vendor terms; installation does not transfer ownership or relicense them.
 
 No legacy Jerry, Maya, Zoya, or Tech GPTx code or protected UI assets were used.
-No dependency on a Gemini, wake-word, or third-party integration SDK is present in
-this foundation. Review attribution whenever dependencies are added or changed.
+The Gemini wire client is original Kotlin code using the public Google API; no Google GenAI SDK code was copied. No wake-word or app-specific integration SDK is present. Review attribution whenever dependencies are added or changed.

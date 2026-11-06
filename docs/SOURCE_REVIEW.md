@@ -47,3 +47,15 @@ See PUBLICATION_VERIFICATION.md for the clean local build/test results and
 FEATURE_STATUS.md for missing/unverified features. Android device behavior is not
 validated by source review or JVM tests. The feature-branch push is authorized;
 main must remain unchanged. No production release or merge is authorized or made.
+
+## 0.3.0 Phase 1 review supplement
+
+Current source hashes are in SOURCE_REVIEW_SHA256.txt; the prior baseline inventory
+is preserved in SOURCE_REVIEW_BASELINE_SHA256.txt. New voice/PCM/session/key/UI code
+was independently written for this project. Only the old application's README
+was read for functionality; no protected source/assets were imported. Official
+Google API wire types were consulted as an interface reference, without copying
+SDK implementation code. OkHttp/Gson/Coroutines/MockWebServer notices are retained.
+Existing actions, automation and theme repositories were compared byte-for-byte
+against remote verified baseline 72743c4 and remain unchanged. No real API key was
+available in cloud. Actual Google/phone acceptance remains pending.

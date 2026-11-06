@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tanimboss.jerryai.actions.ActionsViewModel
 import com.tanimboss.jerryai.automation.AutomationConnection
+import com.tanimboss.jerryai.voice.VoiceViewModel
 import com.tanimboss.jerryai.BuildConfig
 import com.tanimboss.jerryai.JerryViewModel
 import com.tanimboss.jerryai.catalog.FeatureCatalog
@@ -40,11 +41,12 @@ private val DarkColors = darkColorScheme(
     primary = Color(0xFF74E0CF), secondary = Color(0xFFA9CCC3),
     background = Color(0xFF0C1918), surface = Color(0xFF0C1918),
 )
-private enum class Page(val title: String) { HOME("Home"), FEATURES("Features"), SETTINGS("Settings"), DIAGNOSTICS("Diagnostics"), ABOUT("About"), ACTIONS("Actions") }
+private enum class Page(val title: String) { HOME("Home"), FEATURES("Features"), SETTINGS("Settings"), DIAGNOSTICS("Diagnostics"), ABOUT("About"), ACTIONS("Actions"), VOICE("Voice") }
 
 @Composable
 fun JerryApp(viewModel: JerryViewModel) {
     val actionsViewModel = viewModel<ActionsViewModel>()
+    val voiceViewModel = viewModel<VoiceViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val dark = when (state.settings.theme) {
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
@@ -58,7 +60,7 @@ fun JerryApp(viewModel: JerryViewModel) {
             Column(Modifier.fillMaxSize().padding(padding)) {
                 Column(Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
                     Text("JERRY / ORIGINAL", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-                    Text("Jerry AI Assistant", style = MaterialTheme.typography.headlineSmall)
+                    Text("Jerry AI Original", style = MaterialTheme.typography.headlineSmall)
                 }
                 // Two short rows stay usable on narrow phones and at large font sizes.
                 Page.entries.chunked(3).forEach { row ->
@@ -99,6 +101,7 @@ fun JerryApp(viewModel: JerryViewModel) {
                             Page.DIAGNOSTICS -> Diagnostics()
                             Page.ABOUT -> About()
                             Page.ACTIONS -> ActionsScreen(actionsViewModel)
+                            Page.VOICE -> VoiceScreen(voiceViewModel)
                         }
                     }
                 }
@@ -121,11 +124,12 @@ private fun InformationCard(title: String, body: String) {
 private fun Home() {
     Text("Your assistant, built independently.", style = MaterialTheme.typography.headlineMedium)
     InformationCard("Foundation build", "Explore settings, diagnostics and Actions. Supported commands use Android intents first and optional, confirmed accessibility automation. Android device verification is still pending.")
-    InformationCard("Voice is not active", "Gemini, wake word and background listening are unavailable. Actions can accept a command through Android speech input and require preview/confirmation before execution.")
+    InformationCard("Foreground voice", "Configure your own key and a supported model on Voice. Gemini audio requires real provider access and phone testing. Wake word and background listening remain unavailable. Device actions still require the separate confirmation flow.")
     val features = FeatureCatalog.features
     val partial = features.count { it.implementation == ImplementationState.PARTIAL }
     val planned = features.count { it.implementation == ImplementationState.PLANNED }
-    Text("${features.size} initial feature groups · $partial partial groups · $planned planned", style = MaterialTheme.typography.bodyMedium)
+    val implemented = features.count { it.implementation == ImplementationState.IMPLEMENTED_DEVICE_UNVERIFIED }
+    Text("${features.size} initial feature groups · $implemented implemented/device-unverified · $partial partial · $planned planned", style = MaterialTheme.typography.bodyMedium)
     Text("Android device verification is pending. Automated build evidence is recorded in the repository validation report.")
 }
 
@@ -178,8 +182,8 @@ private fun Diagnostics() {
 @Composable
 private fun About() {
     Text("Original contributions", style = MaterialTheme.typography.headlineSmall)
-    Text("Original developer: Tanim Boss\nOwner: Tanim Boss\nPublisher: Tanim Boss")
-    InformationCard("Privacy in this build", "Only your theme preference is persisted. Commands and accessible screen text are processed in memory for confirmed actions, not retained or logged. Android speech input and launched third-party apps may process data under their own policies. Jerry has no microphone, network, contacts or direct-call permission. Backups and device transfer are excluded by configuration.")
+    Text("App name: Jerry AI Original\nOriginal developer: Tanim Boss\nOwner: Tanim Boss\nPublisher: Tanim Boss")
+    InformationCard("Privacy in this build", "Only your theme preference is persisted. Commands and accessible screen text are processed in memory for confirmed actions, not retained or logged. Android speech input and launched third-party apps may process data under their own policies. Foreground Gemini voice requests microphone and network access; it sends live audio to Google only after Start. Jerry has no contacts or direct-call permission. API keys use Keystore-backed encryption outside backups. Backups and device transfer are excluded by configuration.")
     InformationCard("TANIM BOSS EXCLUSIVE OWNERSHIP LICENSE", "Original materials: Copyright © 2026 Tanim Boss. All rights reserved. Copying, modification, redistribution, or commercial use requires separate authorization from Tanim Boss. Third-party components remain under their own licenses. See LICENSE and THIRD_PARTY_NOTICES.md in the source distribution.")
     InformationCard("Third-party software", "AndroidX and Material components: Apache License 2.0. Kotlin: Apache License 2.0. kotlinx.coroutines: Apache License 2.0. Full notices and license texts are included in the source distribution; no third-party ownership is claimed.")
     var showLicenses by rememberSaveable { mutableStateOf(false) }
