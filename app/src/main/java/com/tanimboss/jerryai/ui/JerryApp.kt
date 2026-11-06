@@ -41,7 +41,7 @@ private val DarkColors = darkColorScheme(
     primary = Color(0xFF74E0CF), secondary = Color(0xFFA9CCC3),
     background = Color(0xFF0C1918), surface = Color(0xFF0C1918),
 )
-private enum class Page(val title: String) { HOME("Home"), FEATURES("Features"), SETTINGS("Settings"), DIAGNOSTICS("Diagnostics"), ABOUT("About"), ACTIONS("Actions"), VOICE("Voice") }
+private enum class Page(val title: String) { HOME("Home"), VOICE("Voice"), CHAT("Chat"), MEMORY("Memory"), ACTIONS("Actions"), FEATURES("Features"), SETTINGS("Settings"), DIAGNOSTICS("Diagnostics"), ABOUT("About") }
 
 @Composable
 fun JerryApp(viewModel: JerryViewModel) {
@@ -56,7 +56,13 @@ fun JerryApp(viewModel: JerryViewModel) {
     MaterialTheme(colorScheme = if (dark) DarkColors else LightColors) {
         var selected by rememberSaveable { mutableStateOf(Page.HOME.name) }
         val page = Page.entries.firstOrNull { it.name == selected } ?: Page.HOME
-        Scaffold { padding ->
+        val voiceState by voiceViewModel.state.collectAsStateWithLifecycle()
+        val voicePreferences by voiceViewModel.preferences.collectAsStateWithLifecycle()
+        if (page == Page.HOME) {
+            JerryNeonHomeScreen(voicePhase = voiceState.phase, keyConfigured = voicePreferences.keyPresent) { destination ->
+                if (Page.entries.any { it.name == destination }) selected = destination
+            }
+        } else Scaffold { padding ->
             Column(Modifier.fillMaxSize().padding(padding)) {
                 Column(Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
                     Text("JERRY / ORIGINAL", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
@@ -83,6 +89,16 @@ fun JerryApp(viewModel: JerryViewModel) {
                         state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                         when (page) {
                             Page.HOME -> Home()
+                            Page.CHAT -> {
+                                Text("AI Chat • planned", style = MaterialTheme.typography.headlineSmall)
+                                InformationCard("Not implemented yet",
+                                    "Text AI chat and conversation history are in the Phase 3 backlog. This screen does not send prompts or simulate responses.")
+                            }
+                            Page.MEMORY -> {
+                                Text("Memory Bank • planned", style = MaterialTheme.typography.headlineSmall)
+                                InformationCard("No memories are stored here yet",
+                                    "Room memory, personal learning and backup/restore are planned for Phase 3. Your existing settings and voice key remain unchanged.")
+                            }
                             Page.FEATURES -> Features()
                             Page.SETTINGS -> {
                                 Text("Appearance", style = MaterialTheme.typography.headlineSmall)
@@ -96,7 +112,7 @@ fun JerryApp(viewModel: JerryViewModel) {
                                         label = { Text("${theme.label} theme") },
                                     )
                                 }
-                                Text("Voice, persona, API key, and memory settings arrive with their feature phases. No API key is collected in this build.")
+                                Text("Gemini Live model, voice, language, persona and encrypted API key are configured on the Voice page. Memory settings are not available yet.")
                             }
                             Page.DIAGNOSTICS -> Diagnostics()
                             Page.ABOUT -> About()
@@ -183,7 +199,7 @@ private fun Diagnostics() {
 private fun About() {
     Text("Original contributions", style = MaterialTheme.typography.headlineSmall)
     Text("App name: Jerry AI Original\nOriginal developer: Tanim Boss\nOwner: Tanim Boss\nPublisher: Tanim Boss")
-    InformationCard("Privacy in this build", "Only your theme preference is persisted. Commands and accessible screen text are processed in memory for confirmed actions, not retained or logged. Android speech input and launched third-party apps may process data under their own policies. Foreground Gemini voice requests microphone and network access; it sends live audio to Google only after Start. Jerry has no contacts or direct-call permission. API keys use Keystore-backed encryption outside backups. Backups and device transfer are excluded by configuration.")
+    InformationCard("Privacy in this build", "Theme and voice preferences are saved locally. Your own Gemini API key is encrypted using Android Keystore and excluded from backups. Commands and accessible screen text are used for confirmed actions, not logged as chat history. Android speech input and third-party apps have their own policies. The foreground Gemini Live session sends audio to Google only after Start and microphone permission. No chat or Memory Bank is implemented yet. Jerry has no contacts or direct-call permission. Android app backups and device transfer are disabled.")
     InformationCard("TANIM BOSS EXCLUSIVE OWNERSHIP LICENSE", "Original materials: Copyright © 2026 Tanim Boss. All rights reserved. Copying, modification, redistribution, or commercial use requires separate authorization from Tanim Boss. Third-party components remain under their own licenses. See LICENSE and THIRD_PARTY_NOTICES.md in the source distribution.")
     InformationCard("Third-party software", "AndroidX and Material components: Apache License 2.0. Kotlin: Apache License 2.0. kotlinx.coroutines: Apache License 2.0. Full notices and license texts are included in the source distribution; no third-party ownership is claimed.")
     var showLicenses by rememberSaveable { mutableStateOf(false) }
