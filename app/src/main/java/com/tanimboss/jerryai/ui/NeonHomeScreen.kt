@@ -124,9 +124,9 @@ internal fun JerryNeonHomeScreen(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 NeonShortcut("🚀", "Open Apps", "Confirm", Modifier.weight(1f)) { onOpen("ACTIONS") }
-                NeonShortcut("☎", "Call Contact", "Dialer", Modifier.weight(1f)) { onOpen("ACTIONS") }
-                NeonShortcut("◌", "WhatsApp", "Planned", Modifier.weight(1f)) { onOpen("FEATURES") }
-                NeonShortcut("▶", "YouTube", "Planned", Modifier.weight(1f)) { onOpen("FEATURES") }
+                NeonShortcut("☎", "Call Contact", "Select", Modifier.weight(1f)) { onOpen("CONTACTS") }
+                NeonShortcut("◌", "WhatsApp", "Open app", Modifier.weight(1f)) { onOpen("WHATSAPP") }
+                NeonShortcut("▶", "YouTube Search", "Search", Modifier.weight(1f)) { onOpen("YOUTUBE") }
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
