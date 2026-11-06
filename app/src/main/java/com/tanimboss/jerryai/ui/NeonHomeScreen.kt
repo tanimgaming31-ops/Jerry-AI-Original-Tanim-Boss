@@ -123,12 +123,6 @@ internal fun JerryNeonHomeScreen(
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                NeonShortcut("♬", "Voice Chat", "Configure", Modifier.weight(1f)) { onOpen("VOICE") }
-                NeonShortcut("▣", "AI Chat", "Planned", Modifier.weight(1f)) { onOpen("CHAT") }
-                NeonShortcut("◉", "Memory Bank", "Planned", Modifier.weight(1f)) { onOpen("MEMORY") }
-                NeonShortcut("▦", "Routines", "Planned", Modifier.weight(1f)) { onOpen("FEATURES") }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 NeonShortcut("🚀", "Open Apps", "Confirm", Modifier.weight(1f)) { onOpen("ACTIONS") }
                 NeonShortcut("☎", "Call Contact", "Dialer", Modifier.weight(1f)) { onOpen("ACTIONS") }
                 NeonShortcut("◌", "WhatsApp", "Planned", Modifier.weight(1f)) { onOpen("FEATURES") }
