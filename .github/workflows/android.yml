@@ -1,7 +1,7 @@
 name: Android Jerry original development
 on:
   push:
-    branches: [main, 'feature/jerry-original-phase1', 'feature/jerry-original-full-features']
+    branches: [main, 'feature/jerry-original-phase1', 'feature/jerry-original-full-features', 'feature/jerry-pink-gold-home']
   pull_request:
   workflow_dispatch:
 permissions:
