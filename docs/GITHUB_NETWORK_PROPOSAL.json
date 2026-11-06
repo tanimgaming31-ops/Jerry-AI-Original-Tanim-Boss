@@ -1,0 +1,9 @@
+{
+  "config": {
+    "network": {
+      "allowed_domains": [
+        "api.github.com"
+      ]
+    }
+  }
+}
