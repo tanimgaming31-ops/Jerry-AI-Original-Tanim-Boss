@@ -1,0 +1,38 @@
+TANIM BOSS EXCLUSIVE OWNERSHIP LICENSE
+Version 1.0 — 6 November 2026
+
+Copyright (c) 2026 Tanim Boss. All rights reserved.
+
+1. Scope and ownership
+This license applies only to independently developed original source code,
+documentation, UI designs, and assets in Jerry AI Original that are legally owned
+by Tanim Boss. Tanim Boss is identified as the owner, original developer, and
+publisher of those original contributions. This notice does not transfer any
+third-party right or establish ownership of materials not legally owned by
+Tanim Boss.
+
+2. Reserved rights
+Except as separately authorized in writing by Tanim Boss or permitted by
+applicable law, no permission is granted to copy, modify, distribute, sublicense,
+sell, commercially exploit, or create derivative works of the covered materials.
+Public availability of a repository does not grant an open-source license.
+Authorized use, development, and distribution by Tanim Boss are reserved.
+
+3. Third-party exclusions
+Third-party libraries, tools, generated third-party code, and accompanying
+notices remain governed by their respective licenses. They are excluded from
+this proprietary license. Nothing here restricts rights granted under those
+licenses or claims ownership of Android, AndroidX, Kotlin, Gradle, Gemini,
+WhatsApp, YouTube, Spotify, Instagram, or other third-party materials or marks.
+See THIRD_PARTY_NOTICES.md and licenses/.
+
+4. Notices
+Retain this notice in authorized copies of the covered original materials.
+Retain all applicable third-party copyright, attribution, and license notices.
+
+5. Disclaimer
+TO THE EXTENT PERMITTED BY APPLICABLE LAW, THE COVERED MATERIALS ARE PROVIDED
+"AS IS", WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+TO THE SAME EXTENT, THE RIGHTS HOLDER IS NOT LIABLE FOR DAMAGES ARISING FROM
+USE OF THE COVERED MATERIALS. Mandatory statutory rights remain unaffected.

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Jerry AI Original Phase 1 uses explicitly pinned Android/Gradle dependencies.
+Keep upgrade recommendations visible as warnings instead of failing CI solely
+because newer platform and dependency versions are released.
+All other lint checks retain their default severities and can still fail CI.
+Review these pins before changing target SDK or shipping production releases.
+-->
+<lint>
+    <issue id="OldTargetApi" severity="warning" />
+    <issue id="AndroidGradlePluginVersion" severity="warning" />
+    <issue id="GradleDependency" severity="warning" />
+</lint>
