@@ -20,8 +20,24 @@ sealed interface Command {
 
 /** Deliberately bounded English grammar; screen contents cannot create commands. */
 object CommandParser {
+    /**
+     * Small, explicit voice aliases. Never infer a tap, typing, calling or messaging
+     * action from a translation: every resulting command still goes through the
+     * existing immutable preview and confirmation gate.
+     */
+    private fun normalizeReadOnlyNavigation(input: String): String = when (input.lowercase()) {
+        "অ্যাপ খোলো", "অ্যাপ চালু করো", "ওপেন অ্যাপ" -> "open app"
+        "পেছনে যাও", "পিছনে যাও", "ব্যাক করো" -> "back"
+        "হোমে যাও", "হোম খোলো" -> "home"
+        "উপরে স্ক্রল করো" -> "scroll up"
+        "নিচে স্ক্রল করো" -> "scroll down"
+        "উপরে সোয়াইপ করো", "উপরে সোয়াইপ করো" -> "swipe up"
+        "নিচে সোয়াইপ করো", "নিচে সোয়াইপ করো" -> "swipe down"
+        else -> input
+    }
+
     fun parse(input: String): Command? {
-        val value = input.trim()
+        val value = normalizeReadOnlyNavigation(input.trim())
         if (value.isEmpty() || value.length > 500 || value.any { it.isISOControl() }) return null
         when (value.lowercase()) {
             "open app", "launch app" -> return Command.OpenApp
