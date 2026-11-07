@@ -13,7 +13,11 @@ docs/PUBLICATION_VERIFICATION.md for the packaged checks and evidence limits.
 runs; use the specific run's result/artifact as evidence, not this configuration.
 **Production release:** none. Artifacts are development-signed debug APKs.
 
-## Publication attempt
+## Publication history and current feature branch
+
+The publication attempt below describes the **older** 6 November phase-1 work and must not be read as the status of this new branch. The current `feature/jerry-local-smart-memory-v1` branch is on GitHub with draft PR #6; hosted CI results and eventual APK artifact must be checked on the PR. No phone testing or production release is claimed.
+
+## Earlier publication attempt (6 November 2026)
 
 The feature branch and reviewed source are committed **locally**. The authorized
 Git push was rejected with HTTP 403 using both the existing Git credential route
@@ -27,7 +31,7 @@ This status must not be interpreted as a successful remote publication.
 ## Initial 24-group inventory
 
 Historical completeness is unverified; the supplied inventory is an initial
-baseline. Nine groups have partial code, fifteen are not implemented. No complete
+baseline. Eleven groups have partial code on this feature branch, thirteen are not implemented. No complete
 feature group or Android-phone compatibility is claimed.
 
 | ID | Feature | Implementation | Exact boundary / missing work |
@@ -59,7 +63,7 @@ feature group or Android-phone compatibility is claimed.
 
 ## Implemented command path
 
-Original six-screen UI and themes, diagnostics, typed/external foreground speech
+Original six-screen UI plus the new unmerged Memory tab, themes, diagnostics, typed/external foreground speech
 input, bounded command grammar, immutable single-use 30-second confirmations,
 official Android intents before optional accessibility fallback, manually enabled
 service plus session opt-in, exact-label tap, Back, bounded swipe/scroll, protected
