@@ -25,7 +25,10 @@ object CommandParser {
      * action from a translation: every resulting command still goes through the
      * existing immutable preview and confirmation gate.
      */
-    private fun normalizeReadOnlyNavigation(input: String): String = when (input.lowercase()) {
+    private fun normalizeReadOnlyNavigation(input: String): String {
+        val withoutName = Regex("^(?:জেরি|জেরী|hey jerry|jerry)\\s*[,，:।]?\\s+", RegexOption.IGNORE_CASE)
+            .replaceFirst(input, "")
+        return when (withoutName.lowercase()) {
         "অ্যাপ খোলো", "অ্যাপ চালু করো", "ওপেন অ্যাপ" -> "open app"
         "পেছনে যাও", "পিছনে যাও", "ব্যাক করো" -> "back"
         "হোমে যাও", "হোম খোলো" -> "home"
@@ -34,6 +37,7 @@ object CommandParser {
         "উপরে সোয়াইপ করো", "উপরে সোয়াইপ করো" -> "swipe up"
         "নিচে সোয়াইপ করো", "নিচে সোয়াইপ করো" -> "swipe down"
         else -> input
+        }
     }
 
     fun parse(input: String): Command? {
