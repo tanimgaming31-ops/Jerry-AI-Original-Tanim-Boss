@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Tanim Boss. See LICENSE.
 package com.tanimboss.jerryai.memory
 
+import android.annotation.SuppressLint
 import android.content.Context
 import java.io.IOException
 
@@ -12,6 +13,8 @@ class JerryMemoryRepository(context: Context) {
     @Synchronized fun read(): List<JerryMemoryEntry> =
         JerryMemoryCodec.decode(prefs.getString(key, JerryMemoryCodec.HEADER) ?: JerryMemoryCodec.HEADER)
 
+    // Preserve Android commit()'s Boolean result: edit KTX would silently discard failures.
+    @SuppressLint("UseKtx")
     @Synchronized fun save(items: List<JerryMemoryEntry>) {
         val encoded = JerryMemoryCodec.encode(items)
         if (!prefs.edit().putString(key, encoded).commit()) {
