@@ -32,6 +32,25 @@ class ActionsTest {
             assertEquals(Command.Scroll(it), CommandParser.parse("scroll ${it.name.lowercase()}"))
         }
     }
+    @Test fun acceptsOnlyExplicitBengaliNavigationAliases() {
+        assertEquals(Command.OpenApp, CommandParser.parse("অ্যাপ খোলো"))
+        assertEquals(Command.Back, CommandParser.parse("পেছনে যাও"))
+        assertEquals(Command.Home, CommandParser.parse("হোমে যাও"))
+        assertEquals(Command.Home, CommandParser.parse("জেরি, হোমে যাও"))
+        assertEquals(Command.Back, CommandParser.parse("জেরি, পেছনে যাও"))
+        assertEquals(Command.OpenApp, CommandParser.parse("Hey Jerry, অ্যাপ খোলো"))
+        assertNull(CommandParser.parse("জেরি, পাসওয়ার্ড দাও"))
+        assertNull(CommandParser.parse("জেরি, tap Send"))
+        assertEquals(Command.Scroll(Direction.UP), CommandParser.parse("উপরে স্ক্রল করো"))
+        assertEquals(Command.Scroll(Direction.DOWN), CommandParser.parse("নিচে স্ক্রল করো"))
+        assertEquals(Command.Swipe(Direction.UP), CommandParser.parse("উপরে সোয়াইপ করো"))
+        assertEquals(Command.Swipe(Direction.DOWN), CommandParser.parse("নিচে সোয়াইপ করো"))
+        assertNull(CommandParser.parse("মেসেজ পাঠাও"))
+        assertNull(CommandParser.parse("পাসওয়ার্ড দাও"))
+        assertNull(CommandParser.parse("অ্যাপ\nখোলো"))
+        assertNull(CommandParser.parse("অনুমতি ছাড়া ট্যাপ করো"))
+    }
+
     @Test fun preservesUserTextAndExactTapLabel() {
         assertEquals(Command.Type("Hello Tanim"), CommandParser.parse("type Hello Tanim"))
         assertEquals(Command.Tap("Send"), CommandParser.parse("tap Send"))
