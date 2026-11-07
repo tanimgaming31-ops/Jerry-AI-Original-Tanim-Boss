@@ -24,7 +24,7 @@ out of shared logs/screenshots.
 
 ## Basic application checks — NOT RUN
 
-- Verify app icon/name, ownership/license screens, all six navigation destinations,
+- Verify app icon/name, ownership/license screens, all seven navigation destinations,
   large fonts, narrow/landscape layout, scrolling, TalkBack and system bars.
 - Test theme persistence after rotation, activity recreation, force stop and process
   relaunch. JVM storage tests do not establish on-device behavior.
@@ -81,3 +81,19 @@ test target, not personal messages or paid/destructive actions.
 
 Compiling these paths and passing JVM policy tests does not establish their actual
 behavior on Android. Update device evidence only after the corresponding checks run.
+
+## Local Memory v1 acceptance (feature branch only) — NOT RUN
+
+1. Open the new Memory page. Check the privacy warning and that notes begin empty on a fresh installation.
+2. Add a Bengali memory and an English task; force-stop and restart Jerry. Both should persist.
+3. Search each language; check exact and partial matches. Search must never call Gemini or ask for network permissions.
+4. Export a backup using the Android document picker. Inspect the text header `JERRY_MEMORY_V1` and preserve this file privately. Base64 is **not encryption**.
+5. Import the same backup and confirm: entry count must remain unchanged. Import a second valid backup and confirm that only new entries are merged.
+6. Import an unrelated text file, malformed record and file over 256 KB. The app must reject them without modifying current notes.
+7. Cancel import or export in the picker. No memory should change.
+8. Delete one note using the confirmation dialog. All other notes must remain.
+9. Test storage-unavailable/error handling: no success should be displayed for failed saves.
+10. Test display at large font and on a narrow Android screen, plus old Actions, Settings and Themes.
+11. Preserve a prior installation's app data and signing key. An uninstall/reinstall can erase all local memory.
+
+No phone or emulator test has been run on this branch. Gradle compilation only checks that code can be built, not Android file pickers or persistence.

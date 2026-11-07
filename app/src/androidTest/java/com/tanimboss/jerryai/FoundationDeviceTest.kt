@@ -25,6 +25,8 @@ class FoundationDeviceTest {
         compose.onNodeWithText("Original contributions").assertIsDisplayed()
         compose.onNodeWithText("Actions", useUnmergedTree = true).performClick()
         compose.onNodeWithText("Supported commands").assertIsDisplayed()
+        compose.onNodeWithText("Memory", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("Personal Memory").assertIsDisplayed()
         compose.onNodeWithText("Home", useUnmergedTree = true).performClick()
         compose.onNodeWithText("Voice is not active").performScrollTo().assertIsDisplayed()
     }

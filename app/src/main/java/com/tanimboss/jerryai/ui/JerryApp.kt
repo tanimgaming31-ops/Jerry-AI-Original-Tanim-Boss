@@ -40,7 +40,7 @@ private val DarkColors = darkColorScheme(
     primary = Color(0xFF74E0CF), secondary = Color(0xFFA9CCC3),
     background = Color(0xFF0C1918), surface = Color(0xFF0C1918),
 )
-private enum class Page(val title: String) { HOME("Home"), FEATURES("Features"), SETTINGS("Settings"), DIAGNOSTICS("Diagnostics"), ABOUT("About"), ACTIONS("Actions") }
+private enum class Page(val title: String) { HOME("Home"), FEATURES("Features"), SETTINGS("Settings"), DIAGNOSTICS("Diagnostics"), ABOUT("About"), ACTIONS("Actions"), MEMORY("Memory") }
 
 @Composable
 fun JerryApp(viewModel: JerryViewModel) {
@@ -99,6 +99,7 @@ fun JerryApp(viewModel: JerryViewModel) {
                             Page.DIAGNOSTICS -> Diagnostics()
                             Page.ABOUT -> About()
                             Page.ACTIONS -> ActionsScreen(actionsViewModel)
+                            Page.MEMORY -> JerryMemoryScreen()
                         }
                     }
                 }
