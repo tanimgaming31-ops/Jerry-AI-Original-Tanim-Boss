@@ -42,7 +42,7 @@ class ActionsTest {
         assertEquals(Command.Swipe(Direction.DOWN), CommandParser.parse("নিচে সোয়াইপ করো"))
         assertNull(CommandParser.parse("মেসেজ পাঠাও"))
         assertNull(CommandParser.parse("পাসওয়ার্ড দাও"))
-        assertNull(CommandParser.parse("অ্যাপ খোলো\\n"))
+        assertNull(CommandParser.parse("অ্যাপ\nখোলো"))
         assertNull(CommandParser.parse("অনুমতি ছাড়া ট্যাপ করো"))
     }
 
