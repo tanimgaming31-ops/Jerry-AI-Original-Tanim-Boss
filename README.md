@@ -5,8 +5,20 @@
 Independent Kotlin/Compose Android project, now at **0.2.0 — confirmed actions**.
 Original UI, persistent themes, feature tracking, diagnostics, and an optional
 user-enabled command/accessibility layer. Android-phone behavior is **not tested**.
-Gemini Live, wake word, background listening, chat/history, memory and app-specific
-integrations remain future work.
+Gemini Live, wake word, background listening, chat/history and app-specific
+integrations remain future work. In the unmerged local-memory feature branch only,
+users can manually save/search notes and export/merge backups. This is not AI learning,
+cloud memory or a device-tested feature.
+
+## Local memory in the unmerged feature branch
+
+Use the new **Memory** tab to save a 1–700 character note, find it by Bengali/English text,
+or explicitly export a plain-text backup with the Android document picker. Import checks
+its format, size and entries before a confirmation, then merges only missing notes.
+The existing themes, Actions confirmation gates and other screens are unchanged.
+
+The memory is **not encrypted** and the export format uses Base64 only for portability,
+not secrecy. Do not save API keys, passwords or OTPs. Android phone testing is pending.
 
 ## Supported commands
 
